@@ -1,0 +1,29 @@
+## Unity ##
+ 
+LightingData.asset binary
+NavMesh.asset binary
+ProjectVersion.txt eol=lf
+
+*.exr binary
+*.cs diff=csharp text
+*.cginc text
+*.shader text
+
+*[tT]errain.asset binary
+*.mat eol=lf
+*.anim eol=lf
+*.unity eol=lf
+*.prefab eol=lf
+*.physicsMaterial2D eol=lf
+*.physicsMaterial eol=lf
+*.asset eol=lf
+*.meta eol=lf
+*.controller eol=lf
+*.asmdef eol=lf
+
+## Collapse Unity-generated files on GitHub
+*.asset linguist-generated
+*.mat linguist-generated
+*.meta linguist-generated
+*.prefab linguist-generated
+*.unity linguist-generated
