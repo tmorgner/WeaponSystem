@@ -1,0 +1,12 @@
+{
+    "name": "NaughtyAttributes.Editor",
+    "references": [
+        "NaughtyAttributes"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

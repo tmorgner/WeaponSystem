@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1226a29f28642899b24b846a8740d68, type: 3}
+  m_Name: CubeWeapon
+  m_EditorClassIdentifier: 
+  rayPool: {fileID: 11400000, guid: 95d49bef58f314f4c84d99c11ebf09f3, type: 2}
+  projectile: {fileID: 3428628666067587003, guid: 6b174dfa37efa8b45aad894d8ce2cdba,
+    type: 3}
+  targetSet: {fileID: 11400000, guid: 44e3b70231fd57e49b4884afcb9cff1e, type: 2}
+  projectileSpeed: 45
+  fireDelay: 1
+  fireCoolDown: 0
+  trackingError: 1
+  maximumTrackingRange: 150
+  targetCone: 90
+  projectileTTL: 5
+  interactWith:
+    serializedVersion: 2
+    m_Bits: 1

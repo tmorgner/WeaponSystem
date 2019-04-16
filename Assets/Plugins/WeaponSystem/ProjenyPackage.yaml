@@ -1,0 +1,20 @@
+Dependencies:
+- UnityTools
+- FluentAssertions
+- NaughtyAttributes
+
+#    - {PackageName}
+#    - {PackageName}
+#    - {PackageName}
+#
+#Extras:
+#    - {PackageName}
+#    - {PackageName}
+#
+#FolderType: {Normal|StreamingAssets|WebGL|AndroidProject|AndroidLibraries|iOS}
+#
+#Platforms:
+#    - {PlatformName}
+#    - {PlatformName}
+#    - {PlatformName}
+#

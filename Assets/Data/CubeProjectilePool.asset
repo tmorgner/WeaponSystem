@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544f45b3c5ce443a81e5ee01ea898906, type: 3}
+  m_Name: CubeProjectilePool
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3428628666067587003, guid: 6b174dfa37efa8b45aad894d8ce2cdba, type: 3}
+  poolSizeLimit: 1000
+  strictLimit: 0
+  preallocatedElements: 100

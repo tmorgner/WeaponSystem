@@ -1,0 +1,10 @@
+{
+    "name": "NaughtyAttributes.Test",
+    "references": [
+        "NaughtyAttributes"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

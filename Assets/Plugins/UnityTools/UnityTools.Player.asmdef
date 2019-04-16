@@ -1,0 +1,14 @@
+{
+    "name": "UnityTools.Player",
+    "references": [
+        "NaughtyAttributes"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
