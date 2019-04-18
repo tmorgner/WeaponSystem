@@ -1,28 +1,53 @@
 ﻿using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityTools;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 {
-    public abstract class WeaponTargetTracker : MonoBehaviour
-    {
-        public abstract bool HasTarget { get; }
-        public abstract float PredictPosition(out Vector3 predictedPosition);
-        public abstract void ResetTarget();
-    }
-
+    /// <summary>
+    ///   A default implementation of a weapon target tracker. This class is responsible for
+    ///   tracking potential targets via a trigger collider and for selecting the best target
+    ///   out of that set of targets.
+    ///
+    ///   If the aiming mode is set to <see cref="AimingMode.Manual"/> this tracker will still
+    ///   act as if targeting is assisted, and it is up to the caller to disregard unsuitable
+    ///   information. 
+    /// </summary>
     [RequireComponent(typeof(Rigidbody))]
-    public class DefaultWeaponTargetTracker : WeaponTargetTracker
+    public class DefaultWeaponTargetTracker : WeaponTargetTracker, ITargetSelectionInformation
     {
+        /// <summary>
+        ///  The aiming mode for the tracker.
+        /// </summary>
         public enum AimingMode
         {
-            Assisted, Automatic, Manual
+            /// <summary>
+            ///   Attempts to aim as closely as possible to the current view direction.
+            /// </summary>
+            Assisted = 0,
+            Automatic = 1,
+            Manual = 2
         }
 
-        [SerializeField] Collider trackingCollider;
-        [SerializeField] Transform predictionSource;
-        [SerializeField] WeaponDefinition weaponDefinition;
-        [SerializeField] AimingMode aimingMode;
+        [Required]
+        [SerializeField] 
+        TargetSelectionStrategy targetSelectionStrategy;
+
+        [Required]
+        [SerializeField] 
+        Collider trackingCollider;
+
+        [SerializeField] 
+        Transform predictionSource;
+
+        [Required]
+        [SerializeField] 
+        WeaponDefinition weaponDefinition;
+
+        [SerializeField] 
+        AimingMode aimingMode;
+
         readonly List<Rigidbody> trackedTargets;
         float targetConeExtent;
         Rigidbody trackedTarget;
@@ -32,36 +57,62 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 
         public DefaultWeaponTargetTracker()
         {
-            trackedTargets = new List<Rigidbody>();
+            trackedTargets = new List<Rigidbody>(16);
         }
 
+        public WeaponDefinition WeaponDefinition => weaponDefinition;
+
+        /// <summary>
+        ///   Returns the current aiming mode.
+        /// </summary>
         public AimingMode Mode => aimingMode;
 
+        /// <summary>
+        ///  Returns whether this tracker has a target. If there is no valid target this will attempt
+        ///  to find one before returning.
+        /// </summary>
         public override bool HasTarget
         {
             get
             {
-                if (trackedTarget == null || !trackedTarget.gameObject.activeInHierarchy)
-                {
-                    trackedTarget = FindNearestTarget();
-                }
-
+                RevalidateTrackedTarget();
                 return trackedTarget != null && trackedTarget.gameObject.activeInHierarchy;
             }
         }
 
-        public override float PredictPosition(out Vector3 position)
+        protected Rigidbody RevalidateTrackedTarget()
         {
-            if (HasTarget)
+            if (trackedTarget == null || !trackedTarget.gameObject.activeInHierarchy)
             {
-                return PredictPosition(trackedTarget, out position);
+                trackedTarget = FindNearestTarget();
+            }
+
+            return trackedTarget;
+        }
+
+        /// <summary>
+        ///   Attempts to predict the target position towards the currently selected target.
+        /// </summary>
+        /// <param name="distance">The computed distance to the target.</param>
+        /// <param name="position">the predicted target position</param>
+        /// <returns></returns>
+        public override bool PredictCurrentTargetPosition(out float distance, out Vector3 position)
+        {
+            if (trackedTarget != null)
+            {
+                return PredictTargetPosition(trackedTarget, false, out distance, out position);
             }
 
             position = default;
-            return float.MaxValue;
+            distance = 0;
+            return false;
         }
 
-        void Awake()
+        /// <summary>
+        ///   Unity event callback. Validates the tracking collider and if the collider is a box or sphere
+        ///   makes sure that the collider is large enough to cover the tracking area.
+        /// </summary>
+        internal void Awake()
         {
             body = GetComponent<Rigidbody>();
             targetConeExtent = Mathf.Cos(weaponDefinition.TargetCone * Mathf.Deg2Rad);
@@ -77,6 +128,21 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                 targetArea.center = new Vector3(0, 0, maximumTrackingRange / 2);
                 targetArea.radius = maximumTrackingRange / 2;
             }
+            else if (trackingCollider is BoxCollider boxedTargetArea)
+            {
+                var maximumTrackingRange = weaponDefinition.MaximumTrackingRange;
+                boxedTargetArea.center = new Vector3(0, 0, maximumTrackingRange / 2);
+                boxedTargetArea.size = Vector3.one * maximumTrackingRange / 2;
+            }
+            else if (trackingCollider != null)
+            {
+                var maximumTrackingRange = weaponDefinition.MaximumTrackingRange;
+                var bounds = trackingCollider.bounds;
+                if (bounds.size.x >= maximumTrackingRange && bounds.size.y >= maximumTrackingRange && bounds.size.z >= maximumTrackingRange)
+                {
+                    Debug.Log("Non-primitive collider used for tracking. Please make sure your collider covers the target area defined in the weapon definition.");
+                }
+            }
 
             if (aimingMode == AimingMode.Automatic)
             {
@@ -86,9 +152,18 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             {
                 aiming = new AimAssistMeasure(predictionSource);
             }
+
+            AwakeOverride();
         }
 
-        void OnTriggerEnter(Collider other)
+        /// <summary>
+        ///   Extension point for sub classes.
+        /// </summary>
+        protected virtual void AwakeOverride()
+        {
+        }
+
+        internal void OnTriggerEnter(Collider other)
         {
             var rb = other.attachedRigidbody;
             var targetSet = weaponDefinition.TargetSet;
@@ -98,7 +173,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             }
         }
 
-        void OnTriggerExit(Collider other)
+        internal void OnTriggerExit(Collider other)
         {
             var rb = other.attachedRigidbody;
             var targetSet = weaponDefinition.TargetSet;
@@ -108,8 +183,41 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             }
         }
 
+        public float MaximumTargetRange => weaponDefinition.MaximumTrackingRange;
 
-        float PredictPosition(Rigidbody possibleTarget, out Vector3 position)
+        bool ITargetSelectionInformation.PredictTargetPosition(Rigidbody possibleTarget, out float distance, out Vector3 position)
+        {
+            return PredictTargetPosition(possibleTarget, true, out distance, out position);
+        }
+
+        /// <summary>
+        /// <para>
+        /// Attempts to predict the target <paramref name="position"/> where the
+        /// gun would have to shoot at to hit the target assuming it maintains
+        /// course and speed. If <paramref name="targetSelection"/> is true,
+        /// this will take the initial charge into account.
+        /// </para>
+        /// <para>
+        /// This method returns <see langword="false"/> if the target would be
+        /// outside of the tracking range when the projectile hits.
+        /// </para>
+        /// </summary>
+        /// <param name="possibleTarget">
+        /// The possible target that should be shot at
+        /// </param>
+        /// <param name="targetSelection">
+        /// a flag indicating whether this prediction should account for weapon
+        /// charge time
+        /// </param>
+        /// <param name="distance">
+        /// the resulting distance to the firing spot
+        /// </param>
+        /// <param name="position">the future target position</param>
+        /// <returns>
+        /// <see langword="true"/> if the target can be fired within the current
+        /// tracking range, <see langword="false"/> otherwise.
+        /// </returns>
+        protected bool PredictTargetPosition(Rigidbody possibleTarget, bool targetSelection, out float distance, out Vector3 position)
         {
             var rayOrigin = predictionSource.position;
 
@@ -118,10 +226,16 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             {
                 // Not in range
                 position = Vector3.zero;
-                return float.MaxValue;
+                distance = 0;
+                return false;
             }
 
             var timeToTarget = targetRay.magnitude / weaponDefinition.ProjectileSpeed;
+            if (targetSelection)
+            {
+                timeToTarget += weaponDefinition.FireDelay;
+            }
+
             var futureTargetPosition = possibleTarget.position + possibleTarget.velocity * timeToTarget;
 
             // check whether the predicted position for the target is within range.
@@ -131,11 +245,13 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             {
                 // Not in range
                 position = Vector3.zero;
-                return float.MaxValue;
+                distance = 0;
+                return false;
             }
 
             position = futureTargetPosition;
-            return Vector3.Distance(futureTargetPosition, rayOrigin);
+            distance = Vector3.Distance(futureTargetPosition, rayOrigin);
+            return distance < weaponDefinition.MaximumTrackingRange;
         }
 
         Rigidbody FindNearestTarget()
@@ -150,27 +266,21 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                 trackingCollider.enabled = true;
                 return TrackViaCollider();
             }
-
         }
 
         Rigidbody TrackViaTargetSet()
         {
-            foreach (var possibleTarget in weaponDefinition.TargetSet)
-            {
-                var distance = PredictPosition(possibleTarget, out var predictedPosition);
-                if (distance < weaponDefinition.MaximumTrackingRange && IsVisible(possibleTarget))
-                {
-                    aiming.Track(possibleTarget, distance, ref predictedPosition);
-                }
-            }
-
+            aiming.Reset();
+            targetSelectionStrategy.SelectTargets(aiming, this, weaponDefinition.TargetSet);
             return aiming.Result;
         }
 
-        bool IsVisible(Rigidbody possibleTarget)
+        /// <inheritdoc />
+        bool ITargetSelectionInformation.IsVisible(Rigidbody possibleTarget)
         {
-            var direction = possibleTarget.position - predictionSource.position;
-            var count = Physics.RaycastNonAlloc(predictionSource.position,
+            var predictionSourcePosition = predictionSource.position;
+            var direction = possibleTarget.position - predictionSourcePosition;
+            var count = Physics.RaycastNonAlloc(predictionSourcePosition,
                                                 direction,
                                                 hits,
                                                 direction.magnitude + 0.5f,
@@ -183,6 +293,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                     {
                         continue;
                     }
+
                     if (hit.rigidbody == possibleTarget)
                     {
                         return true;
@@ -201,16 +312,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             }
 
             aiming.Reset();
-
-            foreach (var possibleTarget in trackedTargets)
-            {
-                var distance = PredictPosition(possibleTarget, out var predictedPosition);
-                if (distance < weaponDefinition.MaximumTrackingRange && IsVisible(possibleTarget))
-                {
-                    aiming.Track(possibleTarget, distance, ref predictedPosition);
-                }
-            }
-
+            targetSelectionStrategy.SelectTargets(aiming, this, trackedTargets);
             return aiming.Result;
         }
 
@@ -223,79 +325,13 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             }
         }
 
+        /// <summary>
+        ///   Clears the currently tracked target. Use this to force a new search for a potentially better target.
+        /// </summary>
         public override void ResetTarget()
         {
+            aiming.Reset();
             trackedTarget = null;
-        }
-
-        interface IAimingMeasure
-        {
-            void Reset();
-            void Track(Rigidbody body, float distance, ref Vector3 target);
-            Rigidbody Result { get; }
-        }
-
-        class AimAssistMeasure : IAimingMeasure
-        {
-            readonly Transform aimingSource;
-            float alignment;
-            Rigidbody body;
-
-            public AimAssistMeasure(Transform aimingSource)
-            {
-                this.aimingSource = aimingSource;
-                alignment = float.MinValue;
-            }
-
-            public void Reset()
-            {
-                alignment = float.MinValue;
-            }
-
-            /// <summary>
-            ///  Select the target that is most closest to the current firing path.
-            /// </summary>
-            /// <param name="body"></param>
-            /// <param name="distance"></param>
-            /// <param name="target"></param>
-            public void Track(Rigidbody body, float distance, ref Vector3 target)
-            {
-                var dot = Vector3.Dot(aimingSource.forward, (target - aimingSource.position).normalized);
-                if (dot > this.alignment)
-                {
-                    this.body = body;
-                    this.alignment = dot;
-                }
-            }
-
-            public Rigidbody Result => body;
-        }
-
-        class AutoAimingMeasure: IAimingMeasure
-        {
-            float distance;
-            Rigidbody body;
-
-            public AutoAimingMeasure()
-            {
-                distance = float.MaxValue;
-            }
-
-            public void Reset()
-            {
-                distance = float.MaxValue;
-            }
-
-            public void Track(Rigidbody body, float distance, ref Vector3 target)
-            {
-                if (distance < this.distance)
-                {
-                    this.body = body;
-                    this.distance = distance;
-                }
-            }
-
-            public Rigidbody Result => body;
         }
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 425186471}
   - component: {fileID: 425186473}
   - component: {fileID: 425186472}
+  - component: {fileID: 3428628667278861089}
   m_Layer: 9
   m_Name: Muzzle
   m_TagString: Untagged
@@ -4756,6 +4757,18 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &3428628667278861089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 425186470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe08d67c39b447a0893e770a144e76e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &966832925
 GameObject:
   m_ObjectHideFlags: 0
@@ -4767,6 +4780,9 @@ GameObject:
   - component: {fileID: 966832926}
   - component: {fileID: 966832928}
   - component: {fileID: 966832927}
+  - component: {fileID: 3428628667278861088}
+  - component: {fileID: 3428628667278861087}
+  - component: {fileID: 6548544335643913718}
   m_Layer: 9
   m_Name: Hit
   m_TagString: Untagged
@@ -9539,6 +9555,45 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &3428628667278861088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966832925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe08d67c39b447a0893e770a144e76e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3428628667278861087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966832925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57a1491cfc2a48b5a097f003cd73c4fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scorchMark: {fileID: 0}
+--- !u!114 &6548544335643913718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966832925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3977468310364f8196a10e7d3cff933a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moment: 22
+  target: {fileID: 0}
 --- !u!1 &3428628666067587001
 GameObject:
   m_ObjectHideFlags: 0
@@ -9588,13 +9643,12 @@ MonoBehaviour:
   projectileBody: {fileID: 3428628666176216711}
   muzzleFlashEffect: {fileID: 425186470}
   hitEffect: {fileID: 966832925}
-  shotSFX: {fileID: 0}
-  hitSFX: {fileID: 0}
   collisionDetectionDistance: 0
   damagePerHit: 5
   hitBehaviour: 1
   damageRadius: 2
   applyGravity: 1
+  adjustRotationToForwardDirection: 1
 --- !u!1 &3428628666176216711
 GameObject:
   m_ObjectHideFlags: 0

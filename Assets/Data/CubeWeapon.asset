@@ -16,13 +16,16 @@ MonoBehaviour:
   projectile: {fileID: 3428628666067587003, guid: 6b174dfa37efa8b45aad894d8ce2cdba,
     type: 3}
   targetSet: {fileID: 11400000, guid: 44e3b70231fd57e49b4884afcb9cff1e, type: 2}
-  projectileSpeed: 45
-  fireDelay: 1
-  fireCoolDown: 0
   trackingError: 1
   maximumTrackingRange: 150
   targetCone: 90
   projectileTTL: 5
   interactWith:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 0
+  effectiveInteractWith:
+    serializedVersion: 2
+    m_Bits: 4294966783
+  projectileSpeed: 45
+  fireDelay: 1
+  fireCoolDown: 0

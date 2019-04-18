@@ -6,6 +6,8 @@ namespace RabbitStewdio.Unity.Plugins.UnityTools.Scripts
 {
     public abstract class ScriptableServiceObject<TBehaviour> : ScriptableObject where TBehaviour : MonoBehaviour
     {
+        [SerializeField] bool hideInEditor;
+
         public UnityEvent Initialized { get; private set; }
         TBehaviour serviceBehaviour;
         bool initialized;
@@ -53,6 +55,10 @@ namespace RabbitStewdio.Unity.Plugins.UnityTools.Scripts
         {
             var go = new GameObject();
             go.hideFlags = HideFlags.NotEditable | HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+            if (hideInEditor)
+            {
+                go.hideFlags |= HideFlags.HideInHierarchy;
+            }
             go.name = $"{typeof(TBehaviour).Name}-Service";
 
             var service = go.AddComponent<TBehaviour>();

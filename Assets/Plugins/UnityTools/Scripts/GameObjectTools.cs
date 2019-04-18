@@ -9,7 +9,7 @@ namespace UnityTools
 
         static GameObjectTools()
         {
-            componentBuffer = new List<Component>();
+            componentBuffer = new List<Component>(64);
         }
 
         public static void AddChild(this Transform parent, Transform to)
@@ -17,15 +17,40 @@ namespace UnityTools
             to.parent = parent;
         }
 
-        public static List<T> GetComponentNonAlloc<T>(this Component c, List<T> buffer)
+        public static bool TryGetComponent<T>(this Component c, out T result) where T: class
         {
-            return c.gameObject.GetComponentNonAlloc<T>(buffer);
+            return TryGetComponent<T>(c.gameObject, out result);
         }
 
-        public static List<T> GetComponentNonAlloc<T>(this GameObject go, List<T> buffer)
+        public static bool TryGetComponent<T>(this GameObject go, out T result) where T: class
         {
             componentBuffer.Clear();
-            go.GetComponents(typeof(T), componentBuffer);
+            go.GetComponents(componentBuffer);
+            result = default;
+
+            // cannot use var here, as we need to trick the compiler into accepting the cast next.
+            // ReSharper disable once MoreSpecificForeachVariableTypeAvailable
+            foreach (object c in componentBuffer)
+            {
+                result = c as T;
+                if (result != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static List<T> GetComponentsNonAlloc<T>(this Component c, List<T> buffer)
+        {
+            return c.gameObject.GetComponentsNonAlloc<T>(buffer);
+        }
+
+        public static List<T> GetComponentsNonAlloc<T>(this GameObject go, List<T> buffer)
+        {
+            componentBuffer.Clear();
+            go.GetComponents( componentBuffer);
             if (buffer != null)
             {
                 buffer.Clear();
@@ -133,7 +158,7 @@ namespace UnityTools
             componentBuffer.Clear();
             try
             {
-                go.GetComponents(typeof(T), componentBuffer);
+                go.GetComponents( componentBuffer);
                 foreach (var c in componentBuffer)
                 {
                     if (c is T t && ShouldInclude(c, includeInactive))
@@ -150,8 +175,11 @@ namespace UnityTools
 
         static bool ShouldInclude(Component c, bool includeInactive)
         {
-            if (includeInactive) return true;
-            if (c is MonoBehaviour m)
+            if (includeInactive)
+            {
+                return true;
+            }
+            if (c is Behaviour m)
             {
                 return m.enabled;
             }

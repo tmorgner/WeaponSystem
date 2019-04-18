@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
 {
+    /// <summary>
+    ///  A projectile hit behaviour that attaches the projectile to 
+    /// </summary>
     [RequireComponent(typeof(FollowObjectConstraint))]
     public class ProjectileHitBehaviour : MonoBehaviour
     {
@@ -14,6 +17,12 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             constraint = GetComponent<FollowObjectConstraint>();
         }
 
+        /// <summary>
+        ///   Initializer that attaches this gameObject to the given
+        ///   target. The game object will follow any positional or
+        ///   directional changes the target object makes.
+        /// </summary>
+        /// <param name="other"></param>
         public void OnHit(Transform other)
         {
             transform.localPosition = Vector3.zero;

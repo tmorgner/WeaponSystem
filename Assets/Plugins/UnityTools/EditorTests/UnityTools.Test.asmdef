@@ -1,0 +1,19 @@
+{
+    "name": "UnityTools.Test",
+    "references": [
+        "UnityTools.Player",
+        "FluentAssertions"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

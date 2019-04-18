@@ -56,6 +56,7 @@ GameObject:
   - component: {fileID: 8070053247215357043}
   - component: {fileID: 1549436404}
   - component: {fileID: 3721405036838719195}
+  - component: {fileID: 1549436403}
   m_Layer: 0
   m_Name: SphereGun
   m_TagString: Untagged
@@ -130,7 +131,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!114 &3721405036838719195
 MonoBehaviour:
@@ -144,10 +145,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1038d82c5a9c431889b53c532c5a7d58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetSelectionStrategy: {fileID: 11400000, guid: 58b4a8c51dc8c4a419d7028d148e4759,
+    type: 2}
   trackingCollider: {fileID: 3593412581590852779}
   predictionSource: {fileID: 6023086615198928864}
   weaponDefinition: {fileID: 11400000, guid: df40e43849a7a0845bc38b098da52751, type: 2}
   aimingMode: 1
+--- !u!114 &1549436403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6023086614104234805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 694bf60141a64109a041814e27ce2e8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RuntimeSets:
+  - {fileID: 11400000, guid: 44e3b70231fd57e49b4884afcb9cff1e, type: 2}
 --- !u!1 &6023086614139700767
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,12 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
+using UnityTools;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
 {
+    /// <summary>
+    ///   A weapon projectile pool. This class manages a set of preallocated
+    ///   weapon projectiles to reduce pressure on the garbage collector.
+    /// </summary>
+    /// <remarks>
+    ///   You should never need to instantiate this class manually, as it is
+    ///   intended to only ever be used within a WeaponProjectilePool service.
+    /// </remarks>
+    [ExcludeFromObjectFactoryAttribute, ExcludeFromPresetAttribute]
     public class WeaponProjectilePoolBehaviour : MonoBehaviour
     {
-        public struct GameObjectCarrier : IEquatable<GameObjectCarrier>
+        /// <summary>
+        ///   A Game object wrapper that avoids callbacks into Unity's native core
+        ///   when comparing objects for referential equality.
+        /// </summary>
+        struct GameObjectCarrier : IEquatable<GameObjectCarrier>
         {
             public readonly WeaponProjectile GameObject;
             readonly int id;
@@ -50,23 +65,39 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
 
         readonly HashSet<GameObjectCarrier> activeObjects;
         readonly List<WeaponProjectile> pooledObjects;
+        
+        [ReadOnly]
+        [Tooltip("[Auto] A weapon projectile prefab that is used in the pool. This property is set by the service object.")]
         [SerializeField] WeaponProjectile prefab;
+        [ReadOnly]
+        [Tooltip("[Auto] The maximum number of projectiles stored in the pool. This property is set by the service object.")]
         [SerializeField] int poolSizeLimit;
+        [ReadOnly]
+        [Tooltip("[Auto] Indicates whether the pool will generate more projectiles even if when at full capacity.")]
         [SerializeField] bool strictLimit;
         int counter;
 
+        /// <summary>
+        /// Indicates whether the pool will generate more projectiles even if when at full capacity.
+        /// </summary>
         public bool StrictLimit
         {
             get => strictLimit;
             set => strictLimit = value;
         }
 
+        /// <summary>
+        /// A weapon projectile prefab that is used in the pool. This property is set by the service object.
+        /// </summary>
         public WeaponProjectile Prefab
         {
             get => prefab;
             set => prefab = value;
         }
 
+        /// <summary>
+        /// The maximum number of projectiles stored in the pool. This property is set by the service object.
+        /// </summary>
         public int PoolSizeLimit
         {
             get => poolSizeLimit;
@@ -79,11 +110,16 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             activeObjects = new HashSet<GameObjectCarrier>();
         }
 
+        /// <summary>
+        ///  Attempts to reserve a new weapon projectile instance from the pool.
+        /// </summary>
+        /// <param name="ray">The projectile that is reserved, or null if the pool cannot provide an instance.</param>
+        /// <returns>true if a projectile is available, false otherwise. </returns>
         public bool TryGet(out WeaponProjectile ray)
         {
             if (prefab == null)
             {
-                Debug.Log("No prefab");
+                Debug.LogError("The pool instance " + gameObject.GetPath() + " has no valid projectile prefab.");
                 ray = null;
                 return false;
             }
@@ -101,7 +137,6 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             {
                 if (activeObjects.Count >= poolSizeLimit)
                 {
-                    // Debug.Log("Size Limit reached");
                     ray = null;
                     return false;
                 }
@@ -124,6 +159,10 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             return ray;
         }
 
+        /// <summary>
+        ///   Reclaims the given weapon projectile for the pool.
+        /// </summary>
+        /// <param name="ray">The projectile that should be reclaimed.</param>
         public void Release(WeaponProjectile ray)
         {
             ray.gameObject.SetActive(false);
@@ -160,6 +199,9 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             }
         }
 
+        /// <summary>
+        ///   Releases all projectiles from the pool. This destroys all projectiles in the process.
+        /// </summary>
         public void ClearPool()
         {
             foreach (var activeObject in activeObjects)
@@ -173,6 +215,10 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             }
         }
 
+        /// <summary>
+        ///   Pre-allocates the given number of projectiles in this pool.
+        /// </summary>
+        /// <param name="count"></param>
         public void PreAllocate(int count)
         {
             for(var c = 0; c < count; c +=1 )
@@ -191,9 +237,16 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             }
         }
 
+        /// <summary>
+        ///   Ensures that the prefab is inactive. This has the side effect of
+        ///   making the prefab-asset inactive in the editor, however it is
+        ///   the only way we can instantiate objects without triggering
+        ///   'OnEnable' calls.
+        /// </summary>
         public void Activate()
         {
             prefab.gameObject.SetActive(false);
+            
         }
     }
 }

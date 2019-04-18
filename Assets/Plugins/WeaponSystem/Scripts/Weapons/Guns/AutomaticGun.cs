@@ -1,28 +1,70 @@
 ﻿using System.Collections.Generic;
-using RabbitStewdio.Unity.WeaponSystem.Weapons.Guns;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
-namespace Plugins.WeaponSystem.Scripts.Weapons.Guns
+namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 {
+    /// <summary>
+    ///   An automatic gun that continuously fires at all targets in the
+    ///   tracking area. This class needs at least one configured barrel to work
+    ///   correctly.
+    /// </summary>
     public class AutomaticGun : GunBase
     {
-        [SerializeField] List<GameObject> barrels;
+        /// <summary>
+        ///  The gun projectile spawn mode for multi-barrel guns.
+        /// </summary>
+        public enum SpawnMode
+        {
+            /// <summary>
+            ///   All barrels shoot at the same time.
+            /// </summary>
+            All,
+            /// <summary>
+            ///   The gun shoots one barrel at a time.
+            /// </summary>
+            RoundRobin
+        }
+
+        [FormerlySerializedAs("barrels")]
+        [SerializeField]
+        List<GameObject> muzzlePoints;
         [SerializeField] GameObject pivotObject;
         [SerializeField] UnityEvent beginIdleEvent;
         [SerializeField] UnityEvent beginChargingEvent;
         [SerializeField] UnityEvent fireEvent;
+        [SerializeField] SpawnMode spawnMode;
+        int nextMuzzleFired;
 
+        /// <summary>
+        ///   A Unity-Event that is fired when the gun became idle.
+        /// </summary>
         public UnityEvent BeginIdleEvent => beginIdleEvent;
 
+        /// <summary>
+        ///   A Unity-Event that is fired when the gun started charging.
+        /// </summary>
         public UnityEvent BeginChargingEvent => beginChargingEvent;
 
+        /// <summary>
+        ///   A Unity-Event that is fired when the gun fired a bullet.
+        /// </summary>
         public UnityEvent FireEvent => fireEvent;
 
-        protected IReadOnlyList<GameObject> Barrels => barrels;
+        /// <summary>
+        ///   A list of muzzle points for the gun. These points are spawn points for projectiles.
+        /// </summary>
+        protected IReadOnlyList<GameObject> MuzzlePoints => muzzlePoints;
 
+        /// <summary>
+        ///   Returns the computed pivot point as origin point for targeting calculations.
+        /// </summary>
         protected override Transform WeaponTargetTrackerOrigin => pivotObject.transform;
 
+        /// <summary>
+        ///   Recomputes the pivot object if necessary.
+        /// </summary>
         protected virtual void Awake()
         {
             if (pivotObject == null)
@@ -34,33 +76,35 @@ namespace Plugins.WeaponSystem.Scripts.Weapons.Guns
             }
         }
 
+        /// <inheritdoc />
         protected override void BeginIdleOverride()
         {
             beginIdleEvent.Invoke();
         }
 
+        /// <inheritdoc />
         protected override float BeginChargingOverride()
         {
-             beginChargingEvent.Invoke();
+            beginChargingEvent.Invoke();
             return base.BeginChargingOverride();
         }
 
         Vector3 ComputeBarrelCenterPosition()
         {
-            if (barrels.Count == 0)
+            if (muzzlePoints.Count == 0)
             {
                 return transform.position;
             }
 
             var centre = new Vector3();
-            foreach (var b in barrels)
+            foreach (var b in muzzlePoints)
             {
                 centre += b.transform.position;
             }
 
-            centre.x /= barrels.Count;
-            centre.y /= barrels.Count;
-            centre.z /= barrels.Count;
+            centre.x /= muzzlePoints.Count;
+            centre.y /= muzzlePoints.Count;
+            centre.z /= muzzlePoints.Count;
             return centre;
         }
 
@@ -121,28 +165,45 @@ namespace Plugins.WeaponSystem.Scripts.Weapons.Guns
                 return !(dot < 0.0f);
             }
 
-            if (barrels.Count == 0)
+            if (muzzlePoints.Count == 0)
             {
                 return transform.rotation;
             }
 
             var cumulativeVector = new Vector4();
-            var firstBarrelRotation = barrels[0].transform.rotation;
+            var firstBarrelRotation = muzzlePoints[0].transform.rotation;
             var result = firstBarrelRotation;
-            for (var c = 1; c < barrels.Count; c += 1)
+            for (var c = 1; c < muzzlePoints.Count; c += 1)
             {
-                result = AverageQuaternion(ref cumulativeVector, barrels[c].transform.rotation, firstBarrelRotation, c);
+                result = AverageQuaternion(ref cumulativeVector, muzzlePoints[c].transform.rotation, firstBarrelRotation, c);
             }
 
             return result;
         }
 
+        /// <summary>
+        ///   Fires the gun based on the defined fire mode.
+        /// </summary>
+        /// <param name="fireTarget">The target to be fired at</param>
         protected override void BeginFireOverride(Vector3 fireTarget)
         {
             fireEvent.Invoke();
-             foreach (var b in barrels)
+            if (spawnMode == SpawnMode.All)
             {
-                DoFire(b.transform.position, fireTarget);
+                foreach (var b in muzzlePoints)
+                {
+                    DoFire(b.transform.position, fireTarget);
+                }
+            }
+            else if (muzzlePoints.Count > 0)
+            {
+                if (nextMuzzleFired >= muzzlePoints.Count)
+                {
+                    nextMuzzleFired = 0;
+                }
+
+                DoFire(muzzlePoints[nextMuzzleFired].transform.position, fireTarget);
+                nextMuzzleFired = (nextMuzzleFired + 1) % muzzlePoints.Count;
             }
         }
     }
