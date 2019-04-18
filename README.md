@@ -4,7 +4,7 @@ This module contains the necessary code to build projectile weapon systems.
 Although I use the term 'gun', this system works equally well for bows,
 mortars and catapults.
 
-[![Demo](weapon-system-demo.png)](https://youtu.be/Kr6Dx-Wtqs0)]
+![Demo](weapon-system-demo.gif)
 
 The weapon systems created with this library consist of three major parts:
 
