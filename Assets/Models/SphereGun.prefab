@@ -57,6 +57,7 @@ GameObject:
   - component: {fileID: 1549436404}
   - component: {fileID: 3721405036838719195}
   - component: {fileID: 1549436403}
+  - component: {fileID: 1351568988658471959}
   m_Layer: 0
   m_Name: SphereGun
   m_TagString: Untagged
@@ -95,8 +96,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetTracker: {fileID: 3721405036838719195}
   weaponDefinition: {fileID: 11400000, guid: df40e43849a7a0845bc38b098da52751, type: 2}
-  armed: 1
-  barrels:
+  armed: 0
+  muzzlePoints:
   - {fileID: 6023086615557294548}
   - {fileID: 6023086615618218469}
   - {fileID: 6023086615280497159}
@@ -117,6 +118,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  spawnMode: 0
 --- !u!54 &1549436404
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -165,6 +167,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RuntimeSets:
   - {fileID: 11400000, guid: 44e3b70231fd57e49b4884afcb9cff1e, type: 2}
+--- !u!114 &1351568988658471959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6023086614104234805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2611b8c28ad743f9b45722d0faab5ace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponMount: {fileID: 6023086615198928864}
+  rotationSpeed: 1
+  horizontalTrackingRange: {x: -90, y: 90}
+  verticalTrackingRange: {x: -60, y: 20}
+  neutralPosition: {fileID: 6023086614104234804}
+  targetTracker: {fileID: 3721405036838719195}
 --- !u!1 &6023086614139700767
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +243,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f56b3eb5fccf3174fb367eac2af2f2fa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -66,6 +66,10 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
         [Tooltip("A delay in seconds after a projectile has launched and an attempt to acquire a new target. Use  this to produce a weapon cool-down effect.")]
         [SerializeField] float fireCoolDown;
 
+        [BoxGroup("Launch Properties")]
+        [Tooltip("If there are two firing path, should the system choose the lower or higher one?")]
+        [SerializeField] bool useHighPath;
+
         WeaponProjectilePool effectiveRayPool;
         bool autoCreatedPool;
         WeaponProjectile effectiveProjectile;
@@ -334,6 +338,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
             var term1 = Mathf.Sqrt(b * b - 4 * a * c);
             var time1 = Mathf.Sqrt((-b + term1) / (2 * a));
             var time2 = Mathf.Sqrt((-b - term1) / (2 * a));
+
             if (float.IsNaN(time1))
             {
                 time1 = float.MaxValue;
@@ -363,7 +368,11 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
                 {
                     time = time1;
                 }
-                else
+                else if (useHighPath)
+                {
+                    time = Mathf.Max(time1, time2);
+                }
+                else 
                 {
                     time = Mathf.Min(time1, time2);
                 }

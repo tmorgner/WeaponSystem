@@ -19,13 +19,14 @@ MonoBehaviour:
   trackingError: 1
   maximumTrackingRange: 150
   targetCone: 90
-  projectileTTL: 5
+  projectileTTL: 15
   interactWith:
     serializedVersion: 2
     m_Bits: 0
   effectiveInteractWith:
     serializedVersion: 2
     m_Bits: 4294966783
-  projectileSpeed: 45
+  projectileSpeed: 25
   fireDelay: 1
   fireCoolDown: 0
+  useHighPath: 1

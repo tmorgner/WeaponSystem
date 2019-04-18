@@ -241,7 +241,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 0ba2ca42f22368d4cbc7192aed2a787f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -423,7 +423,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f56b3eb5fccf3174fb367eac2af2f2fa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -560,6 +560,7 @@ GameObject:
   - component: {fileID: 1533429059}
   - component: {fileID: 1533429058}
   - component: {fileID: 5302150119135652914}
+  - component: {fileID: 7363710767467345483}
   m_Layer: 0
   m_Name: CubeGun
   m_TagString: Untagged
@@ -600,7 +601,7 @@ MonoBehaviour:
   targetTracker: {fileID: 1533429058}
   weaponDefinition: {fileID: 11400000, guid: 2c79afc9777cfa74aa7bf7bc1bd6b1b3, type: 2}
   armed: 1
-  barrels:
+  muzzlePoints:
   - {fileID: 3610949885589162834}
   pivotObject: {fileID: 0}
   beginIdleEvent:
@@ -618,6 +619,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  spawnMode: 0
 --- !u!54 &1533429059
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -666,6 +668,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RuntimeSets:
   - {fileID: 11400000, guid: 3e3b683ab11f89141a87cb8a280ec9bf, type: 2}
+--- !u!114 &7363710767467345483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3610949886611001954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2611b8c28ad743f9b45722d0faab5ace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponMount: {fileID: 3610949885589162833}
+  rotationSpeed: 2
+  horizontalTrackingRange: {x: -120, y: 120}
+  verticalTrackingRange: {x: -120, y: 120}
+  neutralPosition: {fileID: 3610949886611001953}
+  targetTracker: {fileID: 1533429058}
 --- !u!1 &3610949887282750544
 GameObject:
   m_ObjectHideFlags: 0
