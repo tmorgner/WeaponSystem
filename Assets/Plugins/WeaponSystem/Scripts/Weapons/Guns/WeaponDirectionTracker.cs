@@ -1,6 +1,6 @@
 ﻿using NaughtyAttributes;
+using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
-using UnityTools;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 {
@@ -20,7 +20,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
     /// </summary>
     public abstract class WeaponDirectionTracker : MonoBehaviour
     {
-        readonly struct Offset
+        struct Offset
         {
             public readonly float Top;
             public readonly float Bottom;

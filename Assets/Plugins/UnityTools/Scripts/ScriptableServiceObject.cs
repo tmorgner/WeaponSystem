@@ -25,6 +25,10 @@ namespace RabbitStewdio.Unity.UnityTools
             OnEnableOverride();
             Application.quitting += OnQuitting;
 
+            if (Application.isPlaying)
+            {
+                OnActiveSceneChanged(SceneManager.GetActiveScene(), SceneManager.GetActiveScene());
+            }
         }
 
         void OnDisable()

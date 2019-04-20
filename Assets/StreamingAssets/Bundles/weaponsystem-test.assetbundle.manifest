@@ -1,0 +1,66 @@
+ManifestFileVersion: 0
+CRC: 1766278586
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 13b4b2f1105740f8803fac5acd81a206
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: fb7050f49c7e9758f9731c43a636e5fa
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 54
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 694bf60141a64109a041814e27ce2e8f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b00a4f222c944511ad2d5c429452bac3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2611b8c28ad743f9b45722d0faab5ace, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3977468310364f8196a10e7d3cff933a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 544f45b3c5ce443a81e5ee01ea898906, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3ad0870411b345b8964756e80a138045, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 82ea157683db4f7888da5f26f937e434, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b1226a29f28642899b24b846a8740d68, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 13e6079af518acd4d830017185a633e9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 57a1491cfc2a48b5a097f003cd73c4fb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1038d82c5a9c431889b53c532c5a7d58, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe08d67c39b447a0893e770a144e76e9, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 135
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+Assets:
+- Assets/Tests/Models/TestGun.prefab
+Dependencies: []

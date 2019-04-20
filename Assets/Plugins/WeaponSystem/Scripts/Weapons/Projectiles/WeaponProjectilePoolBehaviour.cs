@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NaughtyAttributes;
+using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
-using UnityTools;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
 {

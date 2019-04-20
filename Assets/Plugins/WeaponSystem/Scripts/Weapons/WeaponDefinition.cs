@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Text;
 using NaughtyAttributes;
+using RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets;
 using RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles;
 using UnityEngine;
-using UnityTools.SmartVars.RuntimeSets;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons
 {

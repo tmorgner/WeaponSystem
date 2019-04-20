@@ -1,4 +1,4 @@
-﻿using RabbitStewdio.Unity.Plugins.UnityTools.Scripts;
+﻿using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles

@@ -14,14 +14,16 @@ namespace RabbitStewdio.Unity.UnityTools
         Vector3 offset;
         bool haveTarget;
 
-
-
         public void SetTarget(Transform target)
         {
             haveTarget = target != null;
             this.target = target;
-            offset = Quaternion.Inverse(target.rotation) * (transform.position - target.position);
-            rotation = Quaternion.Inverse(target.rotation) * transform.rotation;
+            if (target != null)
+            {
+                var inverse = Quaternion.Inverse(target.rotation);
+                offset = inverse * (transform.position - target.position);
+                rotation = inverse * transform.rotation;
+            }
         }
 
         void Awake()
@@ -37,6 +39,13 @@ namespace RabbitStewdio.Unity.UnityTools
         {
             if (!haveTarget)
             {
+                return;
+            }
+
+            haveTarget = target != null;
+            if (!haveTarget)
+            {
+                target = null;
                 return;
             }
 

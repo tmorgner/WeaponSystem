@@ -1,0 +1,11 @@
+ManifestFileVersion: 0
+CRC: 2101007771
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: weaponsystem-test.assetbundle
+      Dependencies: {}
+    Info_1:
+      Name: weaponsystem-test-scenes.assetbundle
+      Dependencies:
+        Dependency_0: weaponsystem-test.assetbundle

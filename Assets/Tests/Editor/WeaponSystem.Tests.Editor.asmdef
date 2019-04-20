@@ -1,0 +1,20 @@
+{
+    "name": "WeaponSystem.Tests.Editor",
+    "references": [
+        "WeaponSystem.Player",
+        "FluentAssertions",
+        "UnityTools.Player"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using RabbitStewdio.Unity.GunShip.Game;
 using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityTools;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
 {
@@ -557,7 +555,10 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         /// <param name="timeout">indicate whether the projectile has run out of time before hitting something.</param>
         protected virtual void OnProjectileFinished(bool timeout)
         {
-            IgnoreFiredBy(source, false);
+            if (source)
+            {
+                IgnoreFiredBy(source, false);
+            }
 
             HitEffectActive = false;
             MuzzleEffectActive = false;
