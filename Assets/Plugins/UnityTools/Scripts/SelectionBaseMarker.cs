@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RabbitStewdio.Unity.Plugins.UnityTools.Scripts
+namespace RabbitStewdio.Unity.UnityTools
 {
     [SelectionBase]
     public class SelectionBaseMarker : MonoBehaviour

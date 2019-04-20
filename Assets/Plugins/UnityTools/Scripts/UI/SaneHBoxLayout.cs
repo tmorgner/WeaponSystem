@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace VRKitchenSimulator.UI
+namespace RabbitStewdio.Unity.UnityTools.UI
 {
     /// <summary>
     ///     Unity's built in layout components behave rather erratically when asked to deal with

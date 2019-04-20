@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
     public static class PhysicsTools
     {

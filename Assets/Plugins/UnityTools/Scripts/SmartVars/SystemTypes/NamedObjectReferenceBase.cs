@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RabbitStewdio.Unity.GunShip.Scripts.VRHelpers
+namespace RabbitStewdio.Unity.UnityTools.SmartVars.SystemTypes
 {
     public abstract class NamedObjectReferenceBase : ScriptableObject
     {

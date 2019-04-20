@@ -1,5 +1,4 @@
 ﻿using System;
-using RabbitStewdio.Unity.Plugins.UnityTools.Scripts;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools

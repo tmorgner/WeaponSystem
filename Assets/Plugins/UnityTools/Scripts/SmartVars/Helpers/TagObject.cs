@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnityTools.SmartVars.RuntimeSets;
+﻿using RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets;
+using UnityEngine;
 
-namespace UnityTools.SmartVars.Helpers
+namespace RabbitStewdio.Unity.UnityTools.SmartVars.Helpers
 {
   /// <summary>
   ///  Tags a given object and automatically adds it to the given runtime set.

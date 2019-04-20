@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
   public abstract class DelayStartupBehaviour: MonoBehaviour
   {

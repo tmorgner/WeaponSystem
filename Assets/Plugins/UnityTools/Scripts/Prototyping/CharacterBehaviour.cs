@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace UnityTools.Prototyping
+namespace RabbitStewdio.Unity.UnityTools.Prototyping
 {
     [RequireComponent(typeof(CharacterController))]
     public class CharacterBehaviour : MonoBehaviour

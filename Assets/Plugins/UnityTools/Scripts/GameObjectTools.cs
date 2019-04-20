@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
     public static class GameObjectTools
     {

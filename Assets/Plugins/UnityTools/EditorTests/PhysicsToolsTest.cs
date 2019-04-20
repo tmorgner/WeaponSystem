@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
-using UnityTools;
 
 namespace Tests
 {

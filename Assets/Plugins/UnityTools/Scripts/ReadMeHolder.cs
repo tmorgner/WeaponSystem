@@ -1,7 +1,7 @@
 ﻿using NaughtyAttributes;
 using UnityEngine;
 
-namespace VRKitchenSimulator.Scripts
+namespace RabbitStewdio.Unity.UnityTools
 {
     [CreateAssetMenu(menuName = "Unity Tools/Read Me")]
     public class ReadMeHolder : ScriptableObject

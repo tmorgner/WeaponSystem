@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-namespace RabbitStewdio.Unity.Plugins.UnityTools.Scripts
+namespace RabbitStewdio.Unity.UnityTools
 {
     public abstract class ScriptableServiceObject<TBehaviour> : ScriptableObject where TBehaviour : MonoBehaviour
     {

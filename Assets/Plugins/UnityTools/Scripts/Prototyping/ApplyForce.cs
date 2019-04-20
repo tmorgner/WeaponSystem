@@ -1,7 +1,7 @@
 ﻿using NaughtyAttributes;
 using UnityEngine;
 
-namespace UnityTools.Prototyping
+namespace RabbitStewdio.Unity.UnityTools.Prototyping
 {
   public class ApplyForce: MonoBehaviour
   {

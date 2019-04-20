@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
     public class SpatialIndex<T> where T : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UnityTools.SmartVars
+namespace RabbitStewdio.Unity.UnityTools.SmartVars
 {
   public class SmartVariable<TValue> : SmartValue<TValue>
   {

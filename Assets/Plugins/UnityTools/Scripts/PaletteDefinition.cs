@@ -6,7 +6,7 @@ using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
     [CreateAssetMenu(menuName = "Unity Tools/Palette Definition")]
     public class PaletteDefinition : ScriptableObject, ISerializationCallbackReceiver

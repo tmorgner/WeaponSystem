@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RabbitStewdio.Unity.GunShip.Game
+namespace RabbitStewdio.Unity.UnityTools
 {
     public class CompositeColliderCollector : MonoBehaviour, IEnumerable<Collider>
     {

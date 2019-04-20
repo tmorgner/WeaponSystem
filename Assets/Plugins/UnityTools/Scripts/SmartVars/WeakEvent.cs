@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityTools.SmartVars
+namespace RabbitStewdio.Unity.UnityTools.SmartVars
 {
   public class WeakEvent 
   {

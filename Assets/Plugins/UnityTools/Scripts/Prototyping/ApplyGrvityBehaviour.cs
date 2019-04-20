@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UnityTools.Prototyping
+namespace RabbitStewdio.Unity.UnityTools.Prototyping
 {
     [RequireComponent(typeof(CharacterController))]
     public class ApplyGrvityBehaviour : MonoBehaviour

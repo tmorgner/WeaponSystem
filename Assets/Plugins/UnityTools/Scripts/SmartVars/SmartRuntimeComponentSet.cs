@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityTools.SmartVars
+namespace RabbitStewdio.Unity.UnityTools.SmartVars
 {
   public class SmartRuntimeComponentSet<T> : SmartRuntimeSet<T> where T: Component
   {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
   public struct StructTuple<TA, TB, TC> : IEquatable<StructTuple<TA, TB, TC>>
   {

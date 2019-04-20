@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using UnityTools;
 
-namespace RabbitStewdio.Unity.Plugins.UnityTools.Scripts.Prototyping
+namespace RabbitStewdio.Unity.UnityTools.Prototyping
 {
     public class TraceCollisionsBehaviour : MonoBehaviour
     {

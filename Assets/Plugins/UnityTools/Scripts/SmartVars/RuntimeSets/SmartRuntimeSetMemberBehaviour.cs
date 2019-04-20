@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityTools.SmartVars.RuntimeSets
+namespace RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets
 {
   [AddComponentMenu("Smart Variables/Smart Runtime Set Membership")]
   public class SmartRuntimeSetMemberBehaviour : MonoBehaviour

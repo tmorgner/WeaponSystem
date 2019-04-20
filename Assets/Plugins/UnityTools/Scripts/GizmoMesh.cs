@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
     [CreateAssetMenu(menuName = "Unity Tools/Debug/Gizmo Mesh")]
     public class GizmoMesh : ScriptableObject

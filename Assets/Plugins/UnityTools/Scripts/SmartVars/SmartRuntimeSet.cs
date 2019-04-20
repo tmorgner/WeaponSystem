@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace UnityTools.SmartVars
+namespace RabbitStewdio.Unity.UnityTools.SmartVars
 {
   /// <summary>
   ///  This base class exists only because we cannot use interfaces in Unity due to serialisation constraints.

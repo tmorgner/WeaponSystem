@@ -1,4 +1,4 @@
-﻿namespace UnityTools.SmartVars
+﻿namespace RabbitStewdio.Unity.UnityTools.SmartVars
 {
   public enum SmartReferenceType
   {

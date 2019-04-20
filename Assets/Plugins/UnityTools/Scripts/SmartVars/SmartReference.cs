@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnityTools.SmartVars
+namespace RabbitStewdio.Unity.UnityTools.SmartVars
 {
   public abstract class SmartReference<TDataType>
   {

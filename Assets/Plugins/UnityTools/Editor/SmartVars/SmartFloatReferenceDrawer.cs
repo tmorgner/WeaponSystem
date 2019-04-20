@@ -1,5 +1,5 @@
-﻿using UnityEditor;
-using UnityTools.SmartVars.SystemTypes;
+﻿using RabbitStewdio.Unity.UnityTools.SmartVars.SystemTypes;
+using UnityEditor;
 
 namespace UnityTools.SmartVars
 {

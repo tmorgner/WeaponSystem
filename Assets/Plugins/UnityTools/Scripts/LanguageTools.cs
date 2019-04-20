@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq.Expressions;
 
-namespace RabbitStewdio.Unity.Plugins.UnityTools.Scripts
+namespace RabbitStewdio.Unity.UnityTools
 {
     public static class LanguageTools
     {

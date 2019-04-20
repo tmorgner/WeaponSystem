@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnityTools
+namespace RabbitStewdio.Unity.UnityTools
 {
   public static class Validations
   {
