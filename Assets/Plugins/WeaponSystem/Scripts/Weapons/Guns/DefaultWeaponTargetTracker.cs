@@ -166,8 +166,13 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         internal void OnTriggerEnter(Collider other)
         {
             var rb = other.attachedRigidbody;
+            if (!rb)
+            {
+                return;
+            }
+
             var targetSet = weaponDefinition.TargetSet;
-            if (rb != null && targetSet.Contains(rb))
+            if (targetSet == null || targetSet.Contains(rb))
             {
                 trackedTargets.Add(rb);
             }
@@ -176,8 +181,13 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         internal void OnTriggerExit(Collider other)
         {
             var rb = other.attachedRigidbody;
+            if (!rb)
+            {
+                return;
+            }
+
             var targetSet = weaponDefinition.TargetSet;
-            if (rb != null && targetSet.Contains(rb))
+            if (targetSet == null || targetSet.Contains(rb))
             {
                 trackedTargets.Remove(rb);
             }
@@ -256,7 +266,8 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 
         Rigidbody FindNearestTarget()
         {
-            if (weaponDefinition.TargetSet.Count < 5)
+            var targetSet = weaponDefinition.TargetSet;
+            if (targetSet && targetSet.Count < 5)
             {
                 trackingCollider.enabled = false;
                 return TrackViaTargetSet();
