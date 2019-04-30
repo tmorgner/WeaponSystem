@@ -1,14 +1,15 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools.Editor
 {
     /// <summary>
-    ///  AssetBundles cannot contain scripts, so we only have to rebuild them when assets
-    ///  have changed.
+    ///  AssetBundles cannot contain scripts, so we only have to rebuild them
+    ///  when assets have changed.
     /// </summary>
-    public class AutomaticAssetBundleBuilder: AssetPostprocessor
+    public class AutomaticAssetBundleBuilder : AssetPostprocessor
     {
         const bool debug = false;
         static bool mutex;
@@ -16,6 +17,12 @@ namespace RabbitStewdio.Unity.UnityTools.Editor
 
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
+            var allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+            if (allAssetBundleNames.Length == 0)
+            {
+                // No asset bundles defined.
+                return;
+            }
 
             if (debug)
             {
@@ -31,8 +38,7 @@ namespace RabbitStewdio.Unity.UnityTools.Editor
                 return;
             }
 
-            if (IsInAssetBundle(importedAssets) || 
-                IsInAssetBundle(movedAssets))
+            if (IsInAssetBundle(importedAssets) || IsInAssetBundle(movedAssets))
             {
                 if (!requestedCompile)
                 {
@@ -46,9 +52,16 @@ namespace RabbitStewdio.Unity.UnityTools.Editor
         {
             foreach (var name in assetFileName)
             {
-                if (!string.IsNullOrEmpty(AssetDatabase.GetImplicitAssetBundleName(name)))
+                try
                 {
-                    return true;
+                    if (!string.IsNullOrEmpty(AssetDatabase.GetImplicitAssetBundleName(name)))
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning(e.ToString());
                 }
             }
 

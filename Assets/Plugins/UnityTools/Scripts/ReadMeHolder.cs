@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools
 {
-    [CreateAssetMenu(menuName = "Unity Tools/Read Me")]
+    [CreateAssetMenu(menuName = "Tools/Unity Tools/Read Me", fileName = "README")]
     public class ReadMeHolder : ScriptableObject
     {
         [ResizableTextArea]

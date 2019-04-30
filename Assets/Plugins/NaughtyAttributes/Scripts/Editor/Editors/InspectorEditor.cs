@@ -26,7 +26,16 @@ namespace NaughtyAttributes.Editor
 
         private void OnEnable()
         {
-            this.script = this.serializedObject.FindProperty("m_Script");
+            try
+            {
+                this.script = this.serializedObject.FindProperty("m_Script");
+            }
+            catch
+            {
+                // ignore. Unity Bug causes NPE deep inside the unity classes.
+                this.useDefaultInspector = true;
+                return;
+            }
 
             // Cache serialized fields
             this.fields = ReflectionUtility.GetAllFields(this.target, f => this.serializedObject.FindProperty(f.Name) != null);

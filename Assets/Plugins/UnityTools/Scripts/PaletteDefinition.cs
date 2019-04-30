@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools
 {
-    [CreateAssetMenu(menuName = "Unity Tools/Palette Definition")]
+    [CreateAssetMenu(menuName = "Tools/Unity Tools/Palette Definition")]
     public class PaletteDefinition : ScriptableObject, ISerializationCallbackReceiver
     {
         [Tooltip("The number of sub-divisions of the hue scale.")]

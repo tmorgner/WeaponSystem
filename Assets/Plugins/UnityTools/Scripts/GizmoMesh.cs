@@ -2,7 +2,7 @@
 
 namespace RabbitStewdio.Unity.UnityTools
 {
-    [CreateAssetMenu(menuName = "Unity Tools/Debug/Gizmo Mesh")]
+    [CreateAssetMenu(menuName = "Tools/Unity Tools/Debug/Gizmo Mesh")]
     public class GizmoMesh : ScriptableObject
     {
         public Mesh Mesh;
