@@ -143,6 +143,8 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars
       }
     }
 
+    public void RegisterTyped(T o) => Register(o);
+    
     public override void Unregister(object o)
     {
       if (runtimeValues != null && o is T)
@@ -158,6 +160,8 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars
         }
       }
     }
+
+    public void UnregisterTyped(T o) => Register(o);
 
     protected override void OnDisableOverride()
     {

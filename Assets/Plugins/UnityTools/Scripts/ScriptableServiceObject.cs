@@ -10,6 +10,7 @@ namespace RabbitStewdio.Unity.UnityTools
 
         public UnityEvent Initialized { get; private set; }
         TBehaviour serviceBehaviour;
+        bool serviceActive;
         bool initialized;
 
         protected ScriptableServiceObject()
@@ -18,6 +19,8 @@ namespace RabbitStewdio.Unity.UnityTools
         }
 
         public bool IsInitialized => initialized;
+
+        public bool ServiceActive => serviceActive;
 
         void OnEnable()
         {
@@ -67,6 +70,7 @@ namespace RabbitStewdio.Unity.UnityTools
 
             var service = go.AddComponent<TBehaviour>();
             OnConfigureService(service);
+            serviceActive = true;
             Initialized.Invoke();
             return service;
         }
@@ -84,6 +88,7 @@ namespace RabbitStewdio.Unity.UnityTools
             {
                 OnQuittingOverride(ServiceBehaviour);
                 Destroy(serviceBehaviour.gameObject);
+                serviceActive = false;
                 serviceBehaviour = null;
             }
         }
