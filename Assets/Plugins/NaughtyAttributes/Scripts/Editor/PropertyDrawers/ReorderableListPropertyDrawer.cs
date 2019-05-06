@@ -12,19 +12,18 @@ namespace NaughtyAttributes.Editor
         struct PropertyKey : IEquatable<PropertyKey>
         {
             readonly string fieldName;
-            readonly int instanceId;
             readonly object sourceObject;
 
             public PropertyKey(SerializedProperty property)
             {
                 fieldName = property.name;
-                instanceId = property.objectReferenceInstanceIDValue;
                 sourceObject = property.serializedObject;
             }
 
             public bool Equals(PropertyKey other)
             {
-                return string.Equals(fieldName, other.fieldName) && instanceId == other.instanceId && Equals(sourceObject, other.sourceObject);
+                return string.Equals(fieldName, other.fieldName) && 
+                       Equals(sourceObject, other.sourceObject);
             }
 
             public override bool Equals(object obj)
@@ -42,7 +41,6 @@ namespace NaughtyAttributes.Editor
                 unchecked
                 {
                     var hashCode = (fieldName != null ? fieldName.GetHashCode() : 0);
-                    hashCode = (hashCode * 397) ^ instanceId;
                     hashCode = (hashCode * 397) ^ (sourceObject != null ? sourceObject.GetHashCode() : 0);
                     return hashCode;
                 }

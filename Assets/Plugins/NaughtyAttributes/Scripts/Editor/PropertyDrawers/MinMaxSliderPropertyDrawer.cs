@@ -12,7 +12,8 @@ namespace NaughtyAttributes.Editor
 
             MinMaxSliderAttribute minMaxSliderAttribute = PropertyUtility.GetAttribute<MinMaxSliderAttribute>(property);
 
-            if (property.propertyType == SerializedPropertyType.Vector2)
+            if (property.propertyType == SerializedPropertyType.Vector2 || 
+                property.propertyType == SerializedPropertyType.Vector2Int)
             {
                 Rect controlRect = EditorGUILayout.GetControlRect();
                 float labelWidth = EditorGUIUtility.labelWidth;
@@ -50,7 +51,16 @@ namespace NaughtyAttributes.Editor
                 // Draw the slider
                 EditorGUI.BeginChangeCheck();
 
-                Vector2 sliderValue = property.vector2Value;
+                Vector2 sliderValue;
+                if (property.propertyType == SerializedPropertyType.Vector2)
+                {
+                    sliderValue = property.vector2Value;
+                }
+                else
+                {
+                    sliderValue = property.vector2IntValue;
+                }
+
                 EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minMaxSliderAttribute.MinValue, minMaxSliderAttribute.MaxValue);
 
                 sliderValue.x = EditorGUI.FloatField(minFloatFieldRect, sliderValue.x);
@@ -61,7 +71,14 @@ namespace NaughtyAttributes.Editor
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    property.vector2Value = sliderValue;
+                    if (property.propertyType == SerializedPropertyType.Vector2)
+                    {
+                        property.vector2Value = sliderValue;
+                    }
+                    else
+                    {
+                        property.vector2IntValue = new Vector2Int((int)sliderValue.x, (int) sliderValue.y);
+                    }
                 }
             }
             else
