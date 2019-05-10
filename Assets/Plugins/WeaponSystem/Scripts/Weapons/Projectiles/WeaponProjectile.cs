@@ -506,8 +506,14 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         /// <returns>true if the hit is valid, false if the hit should be ignored.</returns>
         protected virtual bool CheckCollisionInstance(HitInformation hit)
         {
+            if (!source)
+            {
+                // the source object has been destroyed after the hit has been fired,
+                return true;
+            }
+
             var hitTransform = hit.transform;
-            while (hitTransform != null)
+            while (hitTransform)
             {
                 if (hitTransform == source.transform)
                 {

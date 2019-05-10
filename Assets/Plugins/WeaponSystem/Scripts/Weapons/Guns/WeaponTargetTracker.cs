@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RabbitStewdio.Unity.UnityTools;
+using UnityEngine;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 {
@@ -7,7 +8,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
     ///   proper interfaces as the serializer cannot handle those.
     /// </summary>
     /// <seealso cref="DefaultWeaponTargetTracker"/>
-    public abstract class WeaponTargetTracker : MonoBehaviour
+    public abstract class WeaponTargetTracker : SelectiveLogBehaviour
     {
         public abstract bool HasTarget { get; }
         public abstract bool PredictCurrentTargetPosition(out float distance, out Vector3 predictedPosition);

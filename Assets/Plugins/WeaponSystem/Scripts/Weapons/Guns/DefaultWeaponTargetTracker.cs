@@ -1,166 +1,127 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NaughtyAttributes;
 using RabbitStewdio.Unity.UnityTools;
+using RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 {
     /// <summary>
-    ///   A default implementation of a weapon target tracker. This class is responsible for
-    ///   tracking potential targets via a trigger collider and for selecting the best target
-    ///   out of that set of targets.
+    ///   A default implementation of a weapon target tracker. This class is
+    ///   responsible for tracking potential targets via a trigger collider and
+    ///   for selecting the best target out of that set of targets.
     ///
-    ///   If the aiming mode is set to <see cref="AimingMode.Manual"/> this tracker will still
-    ///   act as if targeting is assisted, and it is up to the caller to disregard unsuitable
-    ///   information. 
+    ///   If the aiming mode is set to <see cref="TargetTrackerBase.AimingMode.Manual"/> this
+    ///   tracker will still act as if targeting is assisted, and it is up to
+    ///   the caller to disregard unsuitable information. 
     /// </summary>
-    [RequireComponent(typeof(Rigidbody))]
-    public class DefaultWeaponTargetTracker : WeaponTargetTracker, ITargetSelectionInformation
+    public class DefaultWeaponTargetTracker : TargetTrackerBase
     {
-        /// <summary>
-        ///  The aiming mode for the tracker.
-        /// </summary>
-        public enum AimingMode
-        {
-            /// <summary>
-            ///   Attempts to aim as closely as possible to the current view direction.
-            /// </summary>
-            Assisted = 0,
-            Automatic = 1,
-            Manual = 2
-        }
-
         [Required]
-        [SerializeField] 
-        TargetSelectionStrategy targetSelectionStrategy;
-
-        [Required]
-        [SerializeField] 
-        Collider trackingCollider;
-
-        [SerializeField] 
-        Transform predictionSource;
-
-        [Required]
-        [SerializeField] 
+        [SerializeField]
         WeaponDefinition weaponDefinition;
 
-        [SerializeField] 
-        AimingMode aimingMode;
+        [Required]
+        [SerializeField]
+        Collider trackingCollider;
 
-        readonly List<Rigidbody> trackedTargets;
-        float targetConeExtent;
-        Rigidbody trackedTarget;
-        Rigidbody body;
-        IAimingMeasure aiming;
-        static readonly RaycastHit[] hits = new RaycastHit[2];
+        [FormerlySerializedAs("rigidbody")]
+        [SerializeField]
+        Rigidbody monitoredRigidbody;
 
-        public DefaultWeaponTargetTracker()
-        {
-            trackedTargets = new List<Rigidbody>(16);
-        }
+        Rigidbody effectiveRigidbody;
+        TriggerEventForwarder eventForward;
 
         public WeaponDefinition WeaponDefinition => weaponDefinition;
 
-        /// <summary>
-        ///   Returns the current aiming mode.
-        /// </summary>
-        public AimingMode Mode => aimingMode;
-
-        /// <summary>
-        ///  Returns whether this tracker has a target. If there is no valid target this will attempt
-        ///  to find one before returning.
-        /// </summary>
-        public override bool HasTarget
-        {
-            get
-            {
-                RevalidateTrackedTarget();
-                return trackedTarget != null && trackedTarget.gameObject.activeInHierarchy;
-            }
-        }
-
-        protected Rigidbody RevalidateTrackedTarget()
-        {
-            if (trackedTarget == null || !trackedTarget.gameObject.activeInHierarchy)
-            {
-                trackedTarget = FindNearestTarget();
-            }
-
-            return trackedTarget;
-        }
-
-        /// <summary>
-        ///   Attempts to predict the target position towards the currently selected target.
-        /// </summary>
-        /// <param name="distance">The computed distance to the target.</param>
-        /// <param name="position">the predicted target position</param>
-        /// <returns></returns>
-        public override bool PredictCurrentTargetPosition(out float distance, out Vector3 position)
-        {
-            if (trackedTarget != null)
-            {
-                return PredictTargetPosition(trackedTarget, false, out distance, out position);
-            }
-
-            position = default;
-            distance = 0;
-            return false;
-        }
+        protected virtual bool AdjustColliders => true;
 
         /// <summary>
         ///   Unity event callback. Validates the tracking collider and if the collider is a box or sphere
         ///   makes sure that the collider is large enough to cover the tracking area.
         /// </summary>
-        internal void Awake()
+        protected sealed override void AwakeOverride()
         {
-            body = GetComponent<Rigidbody>();
-            targetConeExtent = Mathf.Cos(weaponDefinition.TargetCone * Mathf.Deg2Rad);
+            base.AwakeOverride();
 
-            if (predictionSource == null)
+            if (AdjustColliders && WeaponDefinition)
             {
-                predictionSource = transform;
-            }
-
-            if (trackingCollider is SphereCollider targetArea)
-            {
-                var maximumTrackingRange = weaponDefinition.MaximumTrackingRange;
-                targetArea.center = new Vector3(0, 0, maximumTrackingRange / 2);
-                targetArea.radius = maximumTrackingRange / 2;
-            }
-            else if (trackingCollider is BoxCollider boxedTargetArea)
-            {
-                var maximumTrackingRange = weaponDefinition.MaximumTrackingRange;
-                boxedTargetArea.center = new Vector3(0, 0, maximumTrackingRange / 2);
-                boxedTargetArea.size = Vector3.one * maximumTrackingRange / 2;
-            }
-            else if (trackingCollider != null)
-            {
-                var maximumTrackingRange = weaponDefinition.MaximumTrackingRange;
-                var bounds = trackingCollider.bounds;
-                if (bounds.size.x >= maximumTrackingRange && bounds.size.y >= maximumTrackingRange && bounds.size.z >= maximumTrackingRange)
+                if (trackingCollider is SphereCollider targetArea)
                 {
-                    Debug.Log("Non-primitive collider used for tracking. Please make sure your collider covers the target area defined in the weapon definition.");
+                    var maximumTrackingRange = WeaponDefinition.MaximumTrackingRange;
+                    targetArea.center = new Vector3(0, 0, maximumTrackingRange / 2);
+                    targetArea.radius = maximumTrackingRange / 2;
+                }
+                else if (trackingCollider is BoxCollider boxedTargetArea)
+                {
+                    var maximumTrackingRange = WeaponDefinition.MaximumTrackingRange;
+                    boxedTargetArea.center = new Vector3(0, 0, maximumTrackingRange / 2);
+                    boxedTargetArea.size = Vector3.one * maximumTrackingRange / 2;
+                }
+                else if (trackingCollider != null)
+                {
+                    var maximumTrackingRange = WeaponDefinition.MaximumTrackingRange;
+                    var bounds = trackingCollider.bounds;
+                    if (bounds.size.x >= maximumTrackingRange && bounds.size.y >= maximumTrackingRange && bounds.size.z >= maximumTrackingRange)
+                    {
+                        Debug.Log("Non-primitive collider used for tracking. Please make sure your collider covers the target area defined in the weapon definition.");
+                    }
                 }
             }
 
-            if (aimingMode == AimingMode.Automatic)
-            {
-                aiming = new AutoAimingMeasure();
-            }
-            else
-            {
-                aiming = new AimAssistMeasure(predictionSource);
-            }
-
-            AwakeOverride();
+            AwakeOverride2();
         }
 
-        /// <summary>
-        ///   Extension point for sub classes.
-        /// </summary>
-        protected virtual void AwakeOverride()
+        protected virtual void AwakeOverride2()
         {
+        }
+
+        protected override void OnEnableOverride()
+        {
+            if (!effectiveRigidbody)
+            {
+                if (monitoredRigidbody)
+                {
+                    effectiveRigidbody = monitoredRigidbody;
+                }
+                else
+                {
+                    effectiveRigidbody = GetComponentInParent<Rigidbody>();
+                }
+
+                if (effectiveRigidbody.gameObject != gameObject)
+                {
+                    eventForward = effectiveRigidbody.gameObject.AddComponent<TriggerEventForwarder>();
+                }
+            }
+
+            if (weaponDefinition && weaponDefinition.TargetSet)
+            {
+                weaponDefinition.TargetSet.OnEntryRemoved += OnEntryRemoved;
+            }
+
+            if (eventForward)
+            {
+                eventForward.TriggerEnter += OnTriggerEnter;
+                eventForward.TriggerExit += OnTriggerExit;
+            }
+        }
+
+        void OnDisable()
+        {
+            if (eventForward)
+            {
+                eventForward.TriggerEnter -= OnTriggerEnter;
+                eventForward.TriggerExit -= OnTriggerExit;
+                Destroy(eventForward);
+            }
+
+            if (WeaponDefinition && WeaponDefinition.TargetSet)
+            {
+                WeaponDefinition.TargetSet.OnEntryRemoved -= OnEntryRemoved;
+            }
         }
 
         internal void OnTriggerEnter(Collider other)
@@ -171,11 +132,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                 return;
             }
 
-            var targetSet = weaponDefinition.TargetSet;
-            if (targetSet == null || targetSet.Contains(rb))
-            {
-                trackedTargets.Add(rb);
-            }
+            OnEntryAdded(rb);
         }
 
         internal void OnTriggerExit(Collider other)
@@ -186,163 +143,57 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                 return;
             }
 
-            var targetSet = weaponDefinition.TargetSet;
-            if (targetSet == null || targetSet.Contains(rb))
-            {
-                trackedTargets.Remove(rb);
-            }
+            OnEntryRemoved(rb, false);
         }
 
-        public float MaximumTargetRange => weaponDefinition.MaximumTrackingRange;
+        protected override float TargetConeExtend => (weaponDefinition) ? weaponDefinition.TargetCone : 0;
+        public override float MaximumTargetRange => (weaponDefinition) ? weaponDefinition.MaximumTrackingRange : 0;
+        protected override float ProjectileSpeed => (weaponDefinition) ? weaponDefinition.ProjectileSpeed : 0;
+        protected override float AdditionalDelay => (weaponDefinition) ? weaponDefinition.FireDelay : 0;
 
-        bool ITargetSelectionInformation.PredictTargetPosition(Rigidbody possibleTarget, out float distance, out Vector3 position)
+        protected override LayerMask VisibilityLayerMask
         {
-            return PredictTargetPosition(possibleTarget, true, out distance, out position);
-        }
-
-        /// <summary>
-        /// <para>
-        /// Attempts to predict the target <paramref name="position"/> where the
-        /// gun would have to shoot at to hit the target assuming it maintains
-        /// course and speed. If <paramref name="targetSelection"/> is true,
-        /// this will take the initial charge into account.
-        /// </para>
-        /// <para>
-        /// This method returns <see langword="false"/> if the target would be
-        /// outside of the tracking range when the projectile hits.
-        /// </para>
-        /// </summary>
-        /// <param name="possibleTarget">
-        /// The possible target that should be shot at
-        /// </param>
-        /// <param name="targetSelection">
-        /// a flag indicating whether this prediction should account for weapon
-        /// charge time
-        /// </param>
-        /// <param name="distance">
-        /// the resulting distance to the firing spot
-        /// </param>
-        /// <param name="position">the future target position</param>
-        /// <returns>
-        /// <see langword="true"/> if the target can be fired within the current
-        /// tracking range, <see langword="false"/> otherwise.
-        /// </returns>
-        protected bool PredictTargetPosition(Rigidbody possibleTarget, bool targetSelection, out float distance, out Vector3 position)
-        {
-            var rayOrigin = predictionSource.position;
-
-            var targetRay = possibleTarget.position - rayOrigin;
-            if (targetRay.magnitude > weaponDefinition.MaximumTrackingRange)
+            get
             {
-                // Not in range
-                position = Vector3.zero;
-                distance = 0;
-                return false;
-            }
-
-            var timeToTarget = targetRay.magnitude / weaponDefinition.ProjectileSpeed;
-            if (targetSelection)
-            {
-                timeToTarget += weaponDefinition.FireDelay;
-            }
-
-            var futureTargetPosition = possibleTarget.position + possibleTarget.velocity * timeToTarget;
-
-            // check whether the predicted position for the target is within range.
-            var targetDirection = Vector3.Normalize(futureTargetPosition - rayOrigin);
-            var cosineAngle = Vector3.Dot(targetDirection, transform.forward);
-            if (cosineAngle < targetConeExtent)
-            {
-                // Not in range
-                position = Vector3.zero;
-                distance = 0;
-                return false;
-            }
-
-            position = futureTargetPosition;
-            distance = Vector3.Distance(futureTargetPosition, rayOrigin);
-            return distance < weaponDefinition.MaximumTrackingRange;
-        }
-
-        Rigidbody FindNearestTarget()
-        {
-            var targetSet = weaponDefinition.TargetSet;
-            if (targetSet && targetSet.Count < 5)
-            {
-                trackingCollider.enabled = false;
-                return TrackViaTargetSet();
-            }
-            else
-            {
-                trackingCollider.enabled = true;
-                return TrackViaCollider();
-            }
-        }
-
-        Rigidbody TrackViaTargetSet()
-        {
-            aiming.Reset();
-            targetSelectionStrategy.SelectTargets(aiming, this, weaponDefinition.TargetSet);
-            return aiming.Result;
-        }
-
-        /// <inheritdoc />
-        bool ITargetSelectionInformation.IsVisible(Rigidbody possibleTarget)
-        {
-            var predictionSourcePosition = predictionSource.position;
-            var direction = possibleTarget.position - predictionSourcePosition;
-            var count = Physics.RaycastNonAlloc(predictionSourcePosition,
-                                                direction,
-                                                hits,
-                                                direction.magnitude + 0.5f,
-                                                weaponDefinition.InteractWith);
-            if (count > 0)
-            {
-                foreach (var hit in hits)
+                if (weaponDefinition)
                 {
-                    if (hit.rigidbody == body)
-                    {
-                        continue;
-                    }
-
-                    if (hit.rigidbody == possibleTarget)
-                    {
-                        return true;
-                    }
+                    return weaponDefinition.InteractWith;
                 }
+
+                return -1;
+            }
+        }
+
+        protected override bool IsIgnored(Rigidbody hitRigidbody)
+        {
+            if (!hitRigidbody)
+            {
+                return true;
+            }
+
+            if (effectiveRigidbody)
+            {
+                return hitRigidbody == effectiveRigidbody;
             }
 
             return false;
         }
 
-        Rigidbody TrackViaCollider()
+        protected override ICollection<Rigidbody> TargetSet => weaponDefinition.TargetSet.Values;
+
+        protected override Rigidbody FindNearestTarget()
         {
-            if (trackedTargets.Count == 0)
+            var targetSet = weaponDefinition.TargetSet;
+            if (targetSet && targetSet.Count < 5)
             {
-                return null;
+                trackingCollider.enabled = false;
+                return TrackTargets(weaponDefinition.TargetSet.Values);
             }
-
-            aiming.Reset();
-            targetSelectionStrategy.SelectTargets(aiming, this, trackedTargets);
-            return aiming.Result;
-        }
-
-        void OnDrawGizmosSelected()
-        {
-            if (weaponDefinition != null)
+            else
             {
-                var target = (trackingCollider != null) ? trackingCollider.transform : transform;
-                GameObjectTools.DrawCone(target, weaponDefinition.TargetCone, weaponDefinition.MaximumTrackingRange);
+                trackingCollider.enabled = true;
+                return base.FindNearestTarget();
             }
-        }
-
-        /// <summary>
-        ///   Clears the currently tracked target. Use this to force a new search for a potentially better target.
-        /// </summary>
-        public override void ResetTarget()
-        {
-            aiming.Reset();
-            trackedTarget = null;
         }
     }
 }

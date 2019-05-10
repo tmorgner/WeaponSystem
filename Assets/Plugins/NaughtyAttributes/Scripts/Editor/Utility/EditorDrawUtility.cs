@@ -127,6 +127,10 @@ namespace NaughtyAttributes.Editor
                 {
                     EditorGUILayout.ObjectField(label, (UnityEngine.Object)value, valueType, true);
                 }
+                else 
+                {
+                    EditorGUILayout.TextField(label, $"{value}");
+                }
             }
             else if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {

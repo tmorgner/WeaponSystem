@@ -35,9 +35,9 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         /// </summary>
         public WeaponProjectilePool()
         {
-            poolSizeLimit = 100;
+            poolSizeLimit = 1000;
             strictLimit = false;
-            preallocatedElements = 10;
+            preallocatedElements = 100;
         }
 
         /// <inheritdoc />

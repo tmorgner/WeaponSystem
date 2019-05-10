@@ -1,63 +1,81 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets
 {
-  [AddComponentMenu("Smart Variables/Smart Runtime Set Membership")]
-  public class SmartRuntimeSetMemberBehaviour : MonoBehaviour
-  {
-    public List<SmartRuntimeSet> RuntimeSets;
-
-    public SmartRuntimeSetMemberBehaviour()
+    [AddComponentMenu("Smart Variables/Smart Runtime Set Membership")]
+    public class SmartRuntimeSetMemberBehaviour : MonoBehaviour
     {
-      RuntimeSets = new List<SmartRuntimeSet>();
-    }
+        [Tooltip("Designer note on how this set should be used.")]
+        [ResizableTextArea]
+        [SerializeField]
+        string usageNote;
 
-    void OnDisable()
-    {
-      foreach (var runtimeSet in RuntimeSets)
-      {
-        if (runtimeSet == null)
+        [SerializeField]
+        List<SmartRuntimeSet> RuntimeSets;
+        bool disableCalled;
+
+        public SmartRuntimeSetMemberBehaviour()
         {
-          continue;
+            RuntimeSets = new List<SmartRuntimeSet>();
         }
 
-        var t = runtimeSet.GetMemberType();
-        if (typeof(Component).IsAssignableFrom(t))
+        void OnDisable()
         {
-          var comp = GetComponents(t);
-          foreach (var c in comp)
-          {
-            runtimeSet.Unregister(c);
-          }
-        }
-      }
-    }
+            Debug.Log("Called OnDisable: " + name);
+            foreach (var runtimeSet in RuntimeSets)
+            {
+                if (runtimeSet == null)
+                {
+                    continue;
+                }
 
-    void OnEnable()
-    {
-      foreach (var runtimeSet in RuntimeSets)
-      {
-        if (runtimeSet == null)
+                var t = runtimeSet.GetMemberType();
+                if (typeof(Component).IsAssignableFrom(t))
+                {
+                    var comp = GetComponents(t);
+                    foreach (var c in comp)
+                    {
+                        runtimeSet.Unregister(c);
+                    }
+                }
+            }
+
+            disableCalled = true;
+        }
+
+        void OnEnable()
         {
-          continue;
+            foreach (var runtimeSet in RuntimeSets)
+            {
+                if (runtimeSet == null)
+                {
+                    continue;
+                }
+
+                var t = runtimeSet.GetMemberType();
+                if (typeof(Component).IsAssignableFrom(t))
+                {
+                    var comp = GetComponents(t);
+                    foreach (var c in comp)
+                    {
+                        runtimeSet.Register(c);
+                    }
+                }
+            }
         }
 
-        var t = runtimeSet.GetMemberType();
-        if (typeof(Component).IsAssignableFrom(t))
+        void OnDestroy()
         {
-          var comp = GetComponents(t);
-          foreach (var c in comp)
-          {
-            runtimeSet.Register(c);
-          }
-        }
-      }
-    }
+            if (!disableCalled)
+            {
+                throw new Exception();
+            }
 
-    void OnDestroy()
-    {
-      RuntimeSets.Clear();
+            Debug.Log("Runtime Membership " + name + " DESTROY");
+            RuntimeSets.Clear();
+        }
     }
-  }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
@@ -10,7 +11,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
     public class RandomTargetSelectionStrategy : TargetSelectionStrategy
     {
         /// <inheritdoc />
-        public override void SelectTargets<TList>(IAimingMeasure aiming, ITargetSelectionInformation info, TList potentialTargets)
+        public override void SelectTargets(IAimingMeasure aiming, ITargetSelectionInformation info, ReadOnlyListWrapper<Rigidbody> potentialTargets)
         {
             foreach (var possibleTarget in potentialTargets)
             {

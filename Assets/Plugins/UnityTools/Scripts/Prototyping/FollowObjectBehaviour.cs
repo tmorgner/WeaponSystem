@@ -2,19 +2,24 @@
 
 namespace RabbitStewdio.Unity.UnityTools.Prototyping
 {
-  public class FollowObjectBehaviour: MonoBehaviour
-  {
-    public GameObject Target;
-    public float Distance;
-
-    void LateUpdate()
+    public class FollowObjectBehaviour : MonoBehaviour
     {
-      var t = Target.transform;
-      var fwd = -t.forward;
-      var pos = t.position - fwd * Distance;
+        public GameObject Target;
+        public float Distance;
 
-      transform.position = pos;
-      transform.LookAt(t, t.up);
+        void LateUpdate()
+        {
+            if (!Target)
+            {
+                return;
+            }
+
+            var t = Target.transform;
+            var fwd = -t.forward;
+            var pos = t.position - fwd * Distance;
+
+            transform.position = pos;
+            transform.LookAt(t, t.up);
+        }
     }
-  }
 }

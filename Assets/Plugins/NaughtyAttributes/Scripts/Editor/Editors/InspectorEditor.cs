@@ -185,7 +185,13 @@ namespace NaughtyAttributes.Editor
                 MethodDrawer methodDrawer = MethodDrawerDatabase.GetDrawerForAttribute(drawerAttribute.GetType());
                 if (methodDrawer != null)
                 {
-                    methodDrawer.DrawMethod(this.target, method);
+                    
+                    if (methodDrawer.DrawMethod(this.target, method))
+                    {
+                        this.serializedObject.ApplyModifiedProperties();
+                        this.serializedObject.Update();
+                        PropertyDrawerDatabase.ClearCache();
+                    }
                 }
             }
         }

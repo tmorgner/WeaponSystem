@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class SplitTerrain : EditorWindow
 {
-    [MenuItem("Tools/Terrain Splitter/Split Terrain")]
+    [MenuItem("Tools/Terrain/Split Terrain")]
     static void ShowToolWindow()
     {
         GetWindow<SplitTerrain>();

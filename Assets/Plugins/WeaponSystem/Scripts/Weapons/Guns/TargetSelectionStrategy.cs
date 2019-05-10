@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
@@ -16,6 +17,6 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         /// <param name="measure">A secondary filter that chooses one target out of the supplied targets based on player preference.</param>
         /// <param name="info">A query provider to compute weapon specific parameter for potential targets.</param>
         /// <param name="potentialTargets">A list of potential targets</param>
-        public abstract void SelectTargets<TList>(IAimingMeasure measure, ITargetSelectionInformation info, TList potentialTargets) where TList : IReadOnlyList<Rigidbody>;
+        public abstract void SelectTargets(IAimingMeasure measure, ITargetSelectionInformation info, ReadOnlyListWrapper<Rigidbody> potentialTargets);
     }
 }

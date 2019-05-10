@@ -1,10 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools
 {
     public static class GameObjectTools
     {
+        /// <summary>
+        ///   Implict conversion magic to trick C# into preferring formattables over normal strings.
+        ///   <see href="https://stackoverflow.com/a/39035309"/>
+        /// </summary>
+        public struct FormattableStringPreferenceAdapter
+        {
+            public string String { get; }
+
+            public FormattableStringPreferenceAdapter(string s)
+            {
+                String = s;
+            }
+
+            public override string ToString()
+            {
+                return String;
+            }
+
+            public static implicit operator FormattableStringPreferenceAdapter(string s)
+            {
+                return new FormattableStringPreferenceAdapter(s);
+            }
+
+            public static implicit operator FormattableStringPreferenceAdapter(FormattableString fs)
+            {
+                throw new InvalidOperationException(
+                    "Missing FormattableString overload of method taking this type as argument");
+            }
+        }
+
         static readonly List<Component> componentBuffer;
 
         static GameObjectTools()
@@ -12,17 +43,144 @@ namespace RabbitStewdio.Unity.UnityTools
             componentBuffer = new List<Component>(64);
         }
 
+       public static void LogWithName(this UnityEngine.Object hive, GameObjectTools.FormattableStringPreferenceAdapter format)
+        {
+#if DEBUG
+            if (Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                Debug.Log($"[{hive.name}] {format}", hive);
+            }
+#endif
+        }
+
+       public static void LogWithName(this UnityEngine.Object hive, FormattableString format)
+        {
+#if DEBUG
+            if (Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                Debug.Log($"[{hive.name}] {format}", hive);
+            }
+#endif
+        }
+
+
+       public static void LogWithPath(this GameObject hive, GameObjectTools.FormattableStringPreferenceAdapter format)
+        {
+#if DEBUG
+            if (Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                Debug.Log($"[{hive.GetPath()}] {format}", hive);
+            }
+#endif
+        }
+
+       public static void LogWithPath(this GameObject hive, FormattableString format)
+        {
+#if DEBUG
+            if (Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                Debug.Log($"[{hive.GetPath()}] {format}", hive);
+            }
+#endif
+        }
+
+       public static void Log<T>(this T hive, GameObjectTools.FormattableStringPreferenceAdapter format) where T: UnityEngine.Object, ISelectiveLogBehaviour
+        {
+#if DEBUG
+            if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                var path = hive.LogPath ? hive.Path : hive.Name;
+                Debug.Log($"[{path}] {format}", hive);
+            }
+#endif
+        }
+
+       public static void Log<T>(this T hive, FormattableString format) where T: UnityEngine.Object, ISelectiveLogBehaviour
+        {
+#if DEBUG
+            if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                var path = hive.LogPath ? hive.Path : hive.Name;
+                Debug.Log($"[{path}] {format}", hive);
+            }
+#endif
+        }
+
+       public static void LogBasic<T>(this T hive, GameObjectTools.FormattableStringPreferenceAdapter format) where T: ISelectiveLogBehaviour
+        {
+#if DEBUG
+            if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                var path = hive.LogPath ? hive.Path : hive.Name;
+                Debug.Log($"[{path}] {format}");
+            }
+#endif
+        }
+
+       public static void LogBasic<T>(this T hive, FormattableString format) where T: ISelectiveLogBehaviour
+        {
+#if DEBUG
+            if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
+            {
+                var path = hive.LogPath ? hive.Path : hive.Name;
+                Debug.Log($"[{path}] {format}");
+            }
+#endif
+        }
+
+
+        public static bool HasParent(this GameObject source, GameObject possibleParent)
+        {
+            while (true)
+            {
+                if (source == possibleParent)
+                {
+                    return true;
+                }
+
+                var transformParent = source.transform.parent;
+                if (transformParent)
+                {
+                    source = transformParent.gameObject;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         public static void AddChild(this Transform parent, Transform to)
         {
             to.parent = parent;
         }
 
-        public static bool TryGetComponent<T>(this Component c, out T result) where T: class
+        public static T GetOrCreate<T>(this Component c) where T: Component
+        {
+            if (TryGetComponent<T>(c, out var result))
+            {
+                return result;
+            }
+
+            return c.gameObject.AddComponent<T>();
+        }
+
+        public static T GetOrCreate<T>(this GameObject c) where T: Component
+        {
+            if (TryGetComponent<T>(c, out var result))
+            {
+                return result;
+            }
+
+            return c.gameObject.AddComponent<T>();
+        }
+
+        public static bool TryGetComponent<T>(this Component c, out T result) where T : class
         {
             return TryGetComponent<T>(c.gameObject, out result);
         }
 
-        public static bool TryGetComponent<T>(this GameObject go, out T result) where T: class
+        public static bool TryGetComponent<T>(this GameObject go, out T result) where T : class
         {
             componentBuffer.Clear();
             go.GetComponents(componentBuffer);
@@ -50,7 +208,7 @@ namespace RabbitStewdio.Unity.UnityTools
         public static List<T> GetComponentsNonAlloc<T>(this GameObject go, List<T> buffer)
         {
             componentBuffer.Clear();
-            go.GetComponents( componentBuffer);
+            go.GetComponents(componentBuffer);
             if (buffer != null)
             {
                 buffer.Clear();
@@ -71,7 +229,6 @@ namespace RabbitStewdio.Unity.UnityTools
 
             return buffer;
         }
-
 
         public static List<T> GetComponentsInChildrenNonAlloc<T>(this Component c, List<T> buffer, bool includeInactiveComponents = false, bool includeInactiveGameObject = false)
         {
@@ -158,7 +315,7 @@ namespace RabbitStewdio.Unity.UnityTools
             componentBuffer.Clear();
             try
             {
-                go.GetComponents( componentBuffer);
+                go.GetComponents(componentBuffer);
                 foreach (var c in componentBuffer)
                 {
                     if (c is T t && ShouldInclude(c, includeInactive))
@@ -179,6 +336,7 @@ namespace RabbitStewdio.Unity.UnityTools
             {
                 return true;
             }
+
             if (c is Behaviour m)
             {
                 return m.enabled;
@@ -271,6 +429,14 @@ namespace RabbitStewdio.Unity.UnityTools
 #if UNITY_EDITOR
             UnityEditor.Handles.color = Gizmos.color;
             UnityEditor.Handles.DrawWireDisc(position, normal, radius);
+#endif
+        }
+
+        public static void DrawSolidDisc(Vector3 position, Vector3 normal, float radius)
+        {
+#if UNITY_EDITOR
+            UnityEditor.Handles.color = Gizmos.color;
+            UnityEditor.Handles.DrawSolidDisc(position, normal, radius);
 #endif
         }
     }
