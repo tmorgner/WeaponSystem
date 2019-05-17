@@ -32,6 +32,8 @@ namespace RabbitStewdio.Unity.Plugins.UnityTools.Editor
             layerMask = LayerMaskField("Mask", layerMask);
 
             GUI.enabled = false;
+            EditorGUIUtility.wideMode = true;
+            EditorGUIUtility.labelWidth = 212;
             EditorGUILayout.ObjectField("Target", target, typeof(GameObject), true);
             EditorGUILayout.Vector3Field("Position", position);
             EditorGUILayout.Vector3Field("Normal", normal);

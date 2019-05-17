@@ -23,6 +23,10 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
         /// damage type projectiles this point might lay outside of any collider
         /// of this target.
         /// </param>
-        void OnReceivedHit(GameObject source, IHitDamageSource projectile, Vector3 point);
+        /// <param name="direct"> A flag indicating whether this was a direct collision
+        /// with the projectile or a indirect hit caused by an explosion or area-of-effect
+        /// damage.
+        /// </param>
+        void OnReceivedHit(GameObject source, IHitDamageSource projectile, Vector3 point, bool direct = true);
     }
 }

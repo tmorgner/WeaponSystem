@@ -1,5 +1,6 @@
 ﻿using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 {
@@ -17,6 +18,8 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         [Required]
         [SerializeField] 
         WeaponDefinition weaponDefinition;
+
+        [SerializeField] UnityEvent fireEvent;
 
         [SerializeField] 
         bool armed;
@@ -63,6 +66,18 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             get => armed;
             set => armed = value;
         }
+
+        /// <summary>
+        ///   The current target of the weapon. This provides the actual point of where the
+        ///   weapon fired, including any deviation due to inaccuracies. For non-ballistic
+        ///   weapons this is the point where the projectile will hit.
+        /// </summary>
+        public Vector3 FireTarget { get; protected set; }
+
+        /// <summary>
+        ///   A Unity-Event that is fired when the gun fired a bullet.
+        /// </summary>
+        public UnityEvent FireEvent => fireEvent;
 
         protected GunBase()
         {
@@ -177,6 +192,10 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                           rayATarget * projectileSpeed,
                           weaponDefinition.ProjectileTTL,
                           weaponDefinition.InteractWith);
+                
+                this.FireTarget = fireTarget;
+                this.FireEvent.Invoke();
+
                 return true;
             }
 

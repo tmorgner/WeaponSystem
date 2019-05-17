@@ -33,7 +33,6 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         [SerializeField] GameObject pivotObject;
         [SerializeField] UnityEvent beginIdleEvent;
         [SerializeField] UnityEvent beginChargingEvent;
-        [SerializeField] UnityEvent fireEvent;
         [SerializeField] SpawnMode spawnMode;
         int nextMuzzleFired;
 
@@ -46,11 +45,6 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         ///   A Unity-Event that is fired when the gun started charging.
         /// </summary>
         public UnityEvent BeginChargingEvent => beginChargingEvent;
-
-        /// <summary>
-        ///   A Unity-Event that is fired when the gun fired a bullet.
-        /// </summary>
-        public UnityEvent FireEvent => fireEvent;
 
         /// <summary>
         ///   A list of muzzle points for the gun. These points are spawn points for projectiles.
@@ -187,7 +181,6 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         /// <param name="fireTarget">The target to be fired at</param>
         protected override void BeginFireOverride(Vector3 fireTarget)
         {
-            fireEvent.Invoke();
             if (spawnMode == SpawnMode.All)
             {
                 foreach (var b in muzzlePoints)
@@ -206,5 +199,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                 nextMuzzleFired = (nextMuzzleFired + 1) % muzzlePoints.Count;
             }
         }
+
+        public int MuzzleFired => nextMuzzleFired;
     }
 }

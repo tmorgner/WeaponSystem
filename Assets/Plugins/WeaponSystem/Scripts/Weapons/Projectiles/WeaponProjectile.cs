@@ -114,6 +114,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         bool isHitPrefabNotNull;
         bool isProjectilePrefabNotNull;
         GameObject source;
+        Vector3 velocity;
 
         /// <summary>
         ///   Defines whether the projectile is affected by gravity.
@@ -636,6 +637,8 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
                     var areaHitReceiver = hitTransform.GetComponentInParent<IHitReceiver>();
                     if (areaHitReceiver != null)
                     {
+                        // fire a second raycast from the point of impact to the affected target.
+                        // if the target is not visible, it was shielded from the blast.
                         var directionToHit = hitTransform.position - hitPoint;
                         if (hitBehaviour == WeaponHitBehaviour.Area && Physics.Raycast(hitPoint, directionToHit, out var areaHit, directionToHit.magnitude, layerMask))
                         {
@@ -646,14 +649,14 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
                             }
                         }
 
-                        areaHitReceiver.OnReceivedHit(this.source, this, hitPoint);
+                        areaHitReceiver.OnReceivedHit(this.source, this, hitPoint, other == hitTransform);
                     }
                 }
             }
             else
             {
                 var hitReceiver = other.gameObject.GetComponent<IHitReceiver>();
-                hitReceiver?.OnReceivedHit(this.source, this, hitPoint);
+                hitReceiver?.OnReceivedHit(this.source, this, hitPoint, true);
             }
         }
     }

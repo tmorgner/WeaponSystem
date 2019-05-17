@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace RabbitStewdio.Unity.UnityTools
 {
@@ -43,7 +45,7 @@ namespace RabbitStewdio.Unity.UnityTools
             componentBuffer = new List<Component>(64);
         }
 
-       public static void LogWithName(this UnityEngine.Object hive, GameObjectTools.FormattableStringPreferenceAdapter format)
+       public static void LogWithName(this Object hive, GameObjectTools.FormattableStringPreferenceAdapter format)
         {
 #if DEBUG
             if (Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
@@ -53,7 +55,7 @@ namespace RabbitStewdio.Unity.UnityTools
 #endif
         }
 
-       public static void LogWithName(this UnityEngine.Object hive, FormattableString format)
+       public static void LogWithName(this Object hive, FormattableString format)
         {
 #if DEBUG
             if (Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
@@ -84,7 +86,7 @@ namespace RabbitStewdio.Unity.UnityTools
 #endif
         }
 
-       public static void Log<T>(this T hive, GameObjectTools.FormattableStringPreferenceAdapter format) where T: UnityEngine.Object, ISelectiveLogBehaviour
+       public static void Log<T>(this T hive, GameObjectTools.FormattableStringPreferenceAdapter format) where T: Object, ISelectiveLogBehaviour
         {
 #if DEBUG
             if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
@@ -95,7 +97,7 @@ namespace RabbitStewdio.Unity.UnityTools
 #endif
         }
 
-       public static void Log<T>(this T hive, FormattableString format) where T: UnityEngine.Object, ISelectiveLogBehaviour
+       public static void Log<T>(this T hive, FormattableString format) where T: Object, ISelectiveLogBehaviour
         {
 #if DEBUG
             if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Log))
@@ -177,7 +179,7 @@ namespace RabbitStewdio.Unity.UnityTools
 
         public static bool TryGetComponent<T>(this Component c, out T result) where T : class
         {
-            return TryGetComponent<T>(c.gameObject, out result);
+            return TryGetComponent(c.gameObject, out result);
         }
 
         public static bool TryGetComponent<T>(this GameObject go, out T result) where T : class
@@ -261,7 +263,7 @@ namespace RabbitStewdio.Unity.UnityTools
                 var cgo = transform.GetChild(c).gameObject;
                 if (includeInactiveGameObject || cgo.activeSelf)
                 {
-                    GetComponentsInChildrenInternal<T>(cgo, buffer, includeInactiveComponents, includeInactiveGameObject);
+                    GetComponentsInChildrenInternal(cgo, buffer, includeInactiveComponents, includeInactiveGameObject);
                 }
             }
         }
@@ -419,25 +421,45 @@ namespace RabbitStewdio.Unity.UnityTools
         public static void DrawWireArc(Vector3 position, Vector3 up, Vector3 from, float angle, float radius)
         {
 #if UNITY_EDITOR
-            UnityEditor.Handles.color = Gizmos.color;
-            UnityEditor.Handles.DrawWireArc(position, up, from, angle, radius);
+            Handles.color = Gizmos.color;
+            Handles.DrawWireArc(position, up, @from, angle, radius);
 #endif
         }
 
         public static void DrawWireDisc(Vector3 position, Vector3 normal, float radius)
         {
 #if UNITY_EDITOR
-            UnityEditor.Handles.color = Gizmos.color;
-            UnityEditor.Handles.DrawWireDisc(position, normal, radius);
+            Handles.color = Gizmos.color;
+            Handles.DrawWireDisc(position, normal, radius);
 #endif
         }
 
         public static void DrawSolidDisc(Vector3 position, Vector3 normal, float radius)
         {
 #if UNITY_EDITOR
-            UnityEditor.Handles.color = Gizmos.color;
-            UnityEditor.Handles.DrawSolidDisc(position, normal, radius);
+            Handles.color = Gizmos.color;
+            Handles.DrawSolidDisc(position, normal, radius);
 #endif
+        }
+
+        public static bool FindValidSpawnPoint(this ISelectiveLogBehaviour logger, 
+                                               Vector3 point, LayerMask groundMask, out Vector3 spawnPoint)
+        {
+            if (Physics.Raycast(point + new Vector3(0, 1000, 0),
+                                Vector3.down,
+                                out var hit,
+                                4000,
+                                groundMask))
+            {
+                spawnPoint = hit.point;
+                return true;
+            }
+              //
+            logger.LogBasic("No valid spawn point at " + point + " using ground mask " + groundMask.value);
+            logger.LogBasic("Is Matched? " + groundMask.IsMatched(Terrain.activeTerrain.gameObject));
+            logger.LogBasic("Anthing there? " + Physics.Raycast(point + new Vector3(0, 1000, 0), Vector3.down, 4000));
+            spawnPoint = default;
+            return false;
         }
     }
 }

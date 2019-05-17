@@ -68,11 +68,14 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 
         protected Rigidbody RevalidateTrackedTarget()
         {
-            if (!trackedTarget || !trackedTarget.gameObject.activeInHierarchy)
+            if (trackedTarget && 
+                trackedTarget.gameObject.activeInHierarchy && 
+                TargetSet.Contains(trackedTarget))
             {
-                trackedTarget = FindNearestTarget();
+                return trackedTarget;
             }
 
+            trackedTarget = FindNearestTarget();
             return trackedTarget;
         }
 
@@ -231,8 +234,9 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
                 timeToTarget += AdditionalDelay;
             }
 
-            var futureTargetPosition = possibleTarget.position + possibleTarget.velocity * timeToTarget;
-
+            var actualPosition = GetActualPosition(possibleTarget);
+            var futureTargetPosition = actualPosition + possibleTarget.velocity * timeToTarget;
+  
             // check whether the predicted position for the target is within range.
             var targetDirection = Vector3.Normalize(futureTargetPosition - rayOrigin);
             var cosineAngle = Vector3.Dot(targetDirection, transform.forward);
@@ -250,6 +254,22 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             return distance < MaximumTargetRange;
         }
 
+        Vector3 GetActualPosition(Rigidbody possibleTarget)
+        {
+            Vector3 actualPosition;
+            var marker = possibleTarget.GetComponent<HitAreaMarker>();
+            if (marker)
+            {
+                actualPosition = marker.transform.position;
+            }
+            else
+            {
+                actualPosition = possibleTarget.ClosestPointOnBounds(predictionSource.position);
+            }
+
+            return actualPosition;
+        }
+
         /// <inheritdoc />
         bool ITargetSelectionInformation.IsVisible(Rigidbody possibleTarget)
         {
@@ -259,7 +279,8 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         protected bool IsVisible(Rigidbody possibleTarget)
         {
             var predictionSourcePosition = predictionSource.position;
-            var direction = possibleTarget.position - predictionSourcePosition;
+            var actualPosition = GetActualPosition(possibleTarget);
+            var direction = actualPosition - predictionSourcePosition;
             var count = Physics.RaycastNonAlloc(predictionSourcePosition,
                                                 direction,
                                                 hits,
@@ -315,13 +336,23 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 
         void OnDrawGizmosSelected()
         {
+            var targetRange = 0f;
+            var targetCone = 0f;
             if (MaximumTargetRange <= 0)
             {
-                return;
+                Gizmos.color = Color.red;
+                targetRange = 100;
+                targetCone = 45f;
+            }
+            else
+            {
+                Gizmos.color = Color.white;
+                targetRange = MaximumTargetRange;
+                targetCone = TargetConeExtend;
             }
 
-            var target = (PredictionSource != null) ? PredictionSource.transform : transform;
-            GameObjectTools.DrawCone(target, TargetConeExtend, MaximumTargetRange);
+            var target = (PredictionSource) ? PredictionSource.transform : transform;
+            GameObjectTools.DrawCone(target, targetCone, targetRange);
         }
     }
 }
