@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace RabbitStewdio.Unity.UnityTools.SmartVars.SystemTypes
 {
@@ -6,8 +8,16 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars.SystemTypes
     {
         public GameObject ReferencedObject { get; private set; }
 
+        public UnityEvent ReferencedObjectChanged { get; }
+
+        protected NamedObjectReferenceBase()
+        {
+            ReferencedObjectChanged = new UnityEvent();
+        }
+
         internal void UpdateGameObjectReference(GameObject go)
         {
+            var old = ReferencedObject;
             if (go == null)
             {
                 ReferencedObject = go;
@@ -16,6 +26,11 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars.SystemTypes
             {
                 ReferencedObject = Filter(go);
             }
+
+            if (old != ReferencedObject)
+            {
+                ReferencedObjectChanged?.Invoke();
+            }
         }
 
         protected virtual GameObject Filter(GameObject go)
@@ -23,9 +38,21 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars.SystemTypes
             return go;
         }
 
+        void OnEnable()
+        {
+            ReferencedObjectChanged.RemoveAllListeners();
+            OnEnableOverride();
+        }
+
+        protected virtual void OnEnableOverride()
+        {
+            
+        }
+
         void OnDisable()
         {
             OnDisableOverride();
+            ReferencedObjectChanged.RemoveAllListeners();
             ReferencedObject = null;
         }
 

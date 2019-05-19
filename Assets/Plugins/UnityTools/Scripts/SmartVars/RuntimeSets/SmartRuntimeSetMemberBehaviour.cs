@@ -24,7 +24,6 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets
 
         void OnDisable()
         {
-            Debug.Log("Called OnDisable: " + name);
             foreach (var runtimeSet in RuntimeSets)
             {
                 if (runtimeSet == null)
@@ -74,7 +73,6 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets
                 throw new Exception();
             }
 
-            Debug.Log("Runtime Membership " + name + " DESTROY");
             RuntimeSets.Clear();
         }
     }

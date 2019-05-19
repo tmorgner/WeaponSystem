@@ -97,6 +97,17 @@ namespace RabbitStewdio.Unity.UnityTools
 #endif
         }
 
+       public static void LogWarning<T>(this T hive, GameObjectTools.FormattableStringPreferenceAdapter format) where T: Object, ISelectiveLogBehaviour
+        {
+#if DEBUG
+            if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Warning))
+            {
+                var path = hive.LogPath ? hive.Path : hive.Name;
+                Debug.LogWarning($"[{path}] {format}", hive);
+            }
+#endif
+        }
+
        public static void Log<T>(this T hive, FormattableString format) where T: Object, ISelectiveLogBehaviour
         {
 #if DEBUG
@@ -104,6 +115,17 @@ namespace RabbitStewdio.Unity.UnityTools
             {
                 var path = hive.LogPath ? hive.Path : hive.Name;
                 Debug.Log($"[{path}] {format}", hive);
+            }
+#endif
+        }
+
+       public static void LogWarning<T>(this T hive, FormattableString format) where T: Object, ISelectiveLogBehaviour
+        {
+#if DEBUG
+            if (hive.EnableLogging && Debug.unityLogger.logEnabled && Debug.unityLogger.IsLogTypeAllowed(LogType.Warning))
+            {
+                var path = hive.LogPath ? hive.Path : hive.Name;
+                Debug.LogWarning($"[{path}] {format}", hive);
             }
 #endif
         }
@@ -291,6 +313,31 @@ namespace RabbitStewdio.Unity.UnityTools
             return buffer;
         }
 
+        public static T GetParentComponent<T>(this Component c) where T : Component
+        {
+            if (c)
+            {
+                return c.gameObject.GetParentComponent<T>();
+            }
+
+            return null;
+        }
+        public static T GetParentComponent<T>(this GameObject go) where T: Component
+        {
+            if (!go)
+            {
+                return null;
+            }
+
+            var transformParent = go.transform.parent;
+            if (transformParent)
+            {
+                return transformParent.GetComponentInParent<T>();
+            }
+
+            return null;
+        }
+
         static void GetComponentsInParentsInternal<T>(GameObject go,
                                                       List<T> buffer,
                                                       bool includeInactiveComponents = false,
@@ -346,6 +393,8 @@ namespace RabbitStewdio.Unity.UnityTools
 
             return true;
         }
+
+
 
         public static bool IsMatched(this LayerMask m, GameObject g)
         {

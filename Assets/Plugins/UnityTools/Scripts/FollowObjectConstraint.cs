@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 
 namespace RabbitStewdio.Unity.UnityTools
 {
@@ -8,24 +9,33 @@ namespace RabbitStewdio.Unity.UnityTools
     /// </summary>
     public class FollowObjectConstraint : ObjectConstraint
     {
-
+        [SerializeField] bool recenterToParent;
         [SerializeField] Transform target;
         Quaternion rotation;
+        [ShowNativeProperty]
+        Vector3 Eulers => rotation.eulerAngles; 
+        [ShowNonSerializedField]
         Vector3 offset;
+        [ShowNonSerializedField]
         bool haveTarget;
 
         public void SetTarget(Transform target)
         {
             haveTarget = target != null;
             this.target = target;
-            if (target != null)
+            if (target && !recenterToParent)
             {
                 var inverse = Quaternion.Inverse(target.rotation);
                 offset = inverse * (transform.position - target.position);
                 rotation = inverse * transform.rotation;
             }
+            else
+            {
+                offset = Vector3.zero;
+                rotation = Quaternion.identity;
+            }
         }
-
+        
         void Awake()
         {
             haveTarget = target != null;

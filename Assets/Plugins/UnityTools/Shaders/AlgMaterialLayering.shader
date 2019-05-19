@@ -216,5 +216,5 @@ Shader "Allegorithmic/Material layering" {
 			}
 			ENDCG
 		}
-	CustomEditor "AlgLayeredMaterialEditor"
+//	CustomEditor "AlgLayeredMaterialEditor"
 }
