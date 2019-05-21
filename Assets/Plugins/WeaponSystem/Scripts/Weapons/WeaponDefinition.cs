@@ -69,9 +69,12 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
         [Tooltip("If there are two firing path, should the system choose the lower or higher one?")]
         [SerializeField] bool useHighPath;
 
+        [SerializeField] string displayName;
+        
         WeaponProjectilePool effectiveRayPool;
         bool autoCreatedPool;
         WeaponProjectile effectiveProjectile;
+        
 
         /// <summary>
         ///    Computes the effective projectile prefab by taking both the override on this class and
@@ -146,6 +149,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
         /// <summary>
         ///   A dynamic set of targets used for the weapon.
         /// </summary>
+        [Obsolete("Binding weapons to their targets via the weapon definition was a bad idea.")]
         public SmartRigidBodySet TargetSet => targetSet;
 
         /// <summary>
@@ -199,8 +203,15 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons
         /// </summary>
         public LayerMask InteractWith => effectiveInteractWith;
 
+        public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+
         void OnEnable()
         {
+            if (string.IsNullOrEmpty(displayName))
+            {
+                displayName = name;
+            }
+            
             if (rayPool != null)
             {
                 effectiveRayPool = rayPool;

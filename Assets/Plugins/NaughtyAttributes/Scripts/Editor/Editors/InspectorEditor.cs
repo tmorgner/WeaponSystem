@@ -13,16 +13,38 @@ namespace NaughtyAttributes.Editor
     {
         private SerializedProperty script;
 
-        private IEnumerable<FieldInfo> fields;
-        private HashSet<FieldInfo> groupedFields;
-        private Dictionary<string, List<FieldInfo>> groupedFieldsByGroupName;
-        private IEnumerable<FieldInfo> nonSerializedFields;
-        private IEnumerable<PropertyInfo> nativeProperties;
-        private IEnumerable<MethodInfo> methods;
+        private List<FieldInfo> fields;
+        private readonly HashSet<FieldInfo> groupedFields;
+        private readonly Dictionary<string, List<FieldInfo>> groupedFieldsByGroupName;
+        private List<FieldInfo> nonSerializedFields;
+        private List<PropertyInfo> nativeProperties;
+        private List<MethodInfo> methods;
 
-        private Dictionary<string, SerializedProperty> serializedPropertiesByFieldName;
+        private readonly Dictionary<string, SerializedProperty> serializedPropertiesByFieldName;
 
         private bool useDefaultInspector;
+
+        bool FilterFields(FieldInfo f) => this.serializedObject.FindProperty(f.Name) != null;
+        readonly Func<FieldInfo, bool> filterFieldsDelegate;
+        
+        // Cache non-serialized fields
+        bool NonSerializedFieldsFilter(FieldInfo f)
+        {
+            return f.GetCustomAttribute<DrawerAttribute>(true) != null && this.serializedObject.FindProperty(f.Name) == null;
+        }
+
+        
+        public InspectorEditor()
+        {
+            groupedFieldsByGroupName = new Dictionary<string, List<FieldInfo>>();
+            serializedPropertiesByFieldName = new Dictionary<string, SerializedProperty>();
+            groupedFields = new HashSet<FieldInfo>();
+            fields = new List<FieldInfo>(100);
+            nonSerializedFields = new List<FieldInfo>(100);
+            nativeProperties = new List<PropertyInfo>(100);
+            methods = new List<MethodInfo>(100);
+            filterFieldsDelegate = FilterFields;
+        }
 
         private void OnEnable()
         {
@@ -38,10 +60,16 @@ namespace NaughtyAttributes.Editor
             }
 
             // Cache serialized fields
-            this.fields = ReflectionUtility.GetAllFields(this.target, f => this.serializedObject.FindProperty(f.Name) != null);
+            this.fields = ReflectionUtility.GetAllFieldsEfficiently(this.target, filterFieldsDelegate, this.fields);
+            // Cache serialized properties by field name
+            this.serializedPropertiesByFieldName.Clear();
+            foreach (var field in this.fields)
+            {
+                this.serializedPropertiesByFieldName[field.Name] = this.serializedObject.FindProperty(field.Name);
+            }
 
             // If there are no NaughtyAttributes use default inspector
-            if (this.fields.All(f => f.GetCustomAttributes(typeof(NaughtyAttribute), true).Length == 0))
+            if (this.fields.All(f => f.GetCustomAttribute<NaughtyAttribute>(true) == null))
             {
                 this.useDefaultInspector = true;
             }
@@ -50,17 +78,24 @@ namespace NaughtyAttributes.Editor
                 this.useDefaultInspector = false;
 
                 // Cache grouped fields
-                this.groupedFields = new HashSet<FieldInfo>(this.fields.Where(f => f.GetCustomAttributes(typeof(GroupAttribute), true).Length > 0));
-
+                this.groupedFields.Clear();
+                foreach (var fi in fields)
+                {
+                    if (fi.GetCustomAttribute<GroupAttribute>(true) != null)
+                    {
+                        this.groupedFields.Add(fi);
+                    }
+                }
+                
                 // Cache grouped fields by group name
-                this.groupedFieldsByGroupName = new Dictionary<string, List<FieldInfo>>();
+                groupedFieldsByGroupName.Clear();
                 foreach (var groupedField in this.groupedFields)
                 {
-                    string groupName = (groupedField.GetCustomAttributes(typeof(GroupAttribute), true)[0] as GroupAttribute).Name;
+                    string groupName = (groupedField.GetCustomAttribute<GroupAttribute>(true)).Name;
 
-                    if (this.groupedFieldsByGroupName.ContainsKey(groupName))
+                    if (this.groupedFieldsByGroupName.TryGetValue(groupName, out var list))
                     {
-                        this.groupedFieldsByGroupName[groupName].Add(groupedField);
+                        list.Add(groupedField);
                     }
                     else
                     {
@@ -71,25 +106,17 @@ namespace NaughtyAttributes.Editor
                     }
                 }
 
-                // Cache serialized properties by field name
-                this.serializedPropertiesByFieldName = new Dictionary<string, SerializedProperty>();
-                foreach (var field in this.fields)
-                {
-                    this.serializedPropertiesByFieldName[field.Name] = this.serializedObject.FindProperty(field.Name);
-                }
             }
 
-            // Cache non-serialized fields
-            this.nonSerializedFields = ReflectionUtility.GetAllFields(
-                this.target, f => f.GetCustomAttributes(typeof(DrawerAttribute), true).Length > 0 && this.serializedObject.FindProperty(f.Name) == null);
+            this.nonSerializedFields = ReflectionUtility.GetAllFieldsEfficiently(this.target, NonSerializedFieldsFilter, nonSerializedFields);
 
             // Cache the native properties
-            this.nativeProperties = ReflectionUtility.GetAllProperties(
-                this.target, p => p.GetCustomAttributes(typeof(DrawerAttribute), true).Length > 0);
+            this.nativeProperties = ReflectionUtility.GetAllPropertiesEfficiently(
+                this.target, p => p.GetCustomAttribute<DrawerAttribute>(true) != null, nativeProperties);
 
             // Cache methods with DrawerAttribute
-            this.methods = ReflectionUtility.GetAllMethods(
-                this.target, m => m.GetCustomAttributes(typeof(DrawerAttribute), true).Length > 0);
+            this.methods = ReflectionUtility.GetAllMethodsEfficiently(
+                this.target, m => m.GetCustomAttribute<DrawerAttribute>(true) != null, methods);
         }
 
         private void OnDisable()

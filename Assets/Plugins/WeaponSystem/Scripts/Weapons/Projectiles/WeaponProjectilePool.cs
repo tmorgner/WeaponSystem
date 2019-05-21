@@ -109,6 +109,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
             b.PoolSizeLimit = poolSizeLimit;
             b.Prefab = effectivePrefab;
             b.StrictLimit = strictLimit;
+            b.enabled = false;
             b.Activate();
             b.PreAllocate(preallocatedElements);
 

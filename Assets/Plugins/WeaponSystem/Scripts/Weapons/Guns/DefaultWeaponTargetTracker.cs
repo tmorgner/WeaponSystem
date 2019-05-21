@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using NaughtyAttributes;
-using RabbitStewdio.Unity.UnityTools;
-using RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets;
+﻿using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -179,7 +175,11 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             return false;
         }
 
-        protected override ICollection<Rigidbody> TargetSet => weaponDefinition.TargetSet.Values;
+        protected override bool IsValidTarget(Rigidbody body)
+        {
+            return weaponDefinition.TargetSet.Contains(body);
+        }
+
 
         protected override Rigidbody FindNearestTarget()
         {

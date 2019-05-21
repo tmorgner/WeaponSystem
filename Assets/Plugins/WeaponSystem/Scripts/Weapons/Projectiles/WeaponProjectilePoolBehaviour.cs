@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using NaughtyAttributes;
 using RabbitStewdio.Unity.UnityTools;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
 {
@@ -76,7 +78,9 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         [Tooltip("[Auto] Indicates whether the pool will generate more projectiles even if when at full capacity.")]
         [SerializeField] bool strictLimit;
         int counter;
-
+        int preallocationRequest;
+        Stopwatch preallocationTimer;
+        
         /// <summary>
         /// Indicates whether the pool will generate more projectiles even if when at full capacity.
         /// </summary>
@@ -221,20 +225,52 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         /// <param name="count"></param>
         public void PreAllocate(int count)
         {
-            for(var c = 0; c < count; c +=1 )
+            preallocationRequest = Math.Max(0, Math.Min(count, poolSizeLimit));
+            if (preallocationRequest < pooledObjects.Count)
             {
-                if (pooledObjects.Count < poolSizeLimit)
+                preallocationTimer = new Stopwatch();
+                enabled = true;
+            }
+        }
+
+        void PreallocateObjects()
+        {
+            preallocationTimer.Restart();
+            
+            for(var c = pooledObjects.Count; c < preallocationRequest; c +=1 )
+            {
+                if (pooledObjects.Count >= poolSizeLimit)
                 {
-                    // Debug.Log("Recovered pooled object " + ray);
-                    var ray = AllocateObject();
-                    ray.gameObject.SetActive(false);
-                    pooledObjects.Add(ray);
+                    preallocationTimer = null;
+                    preallocationRequest = 0;
+                    return;
                 }
-                else
+
+                var ray = AllocateObject();
+                ray.gameObject.SetActive(false);
+                pooledObjects.Add(ray);
+
+                if (preallocationTimer.Elapsed.TotalMilliseconds > 0.25)
                 {
+                    // ran out of time budget ..
                     return;
                 }
             }
+
+        }
+
+        void Update()
+        {
+            if (preallocationRequest == 0)
+            {
+                return;
+            }
+
+            PreallocateObjects();
+            if (pooledObjects.Count >= preallocationRequest)
+            {
+                enabled = false;
+            }            
         }
 
         /// <summary>

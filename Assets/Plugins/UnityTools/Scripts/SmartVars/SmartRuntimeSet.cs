@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
@@ -54,6 +55,7 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars
         public event Action<T> OnEntryAdded;
         public event Action<T> OnEntryRemoved;
 
+        [Tooltip("Predefined Designtime Values")]
         [FormerlySerializedAs("Values")] 
         [SerializeField] 
         List<T> values;

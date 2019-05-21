@@ -68,11 +68,6 @@ namespace RabbitStewdio.Unity.UnityTools.SmartVars.RuntimeSets
 
         void OnDestroy()
         {
-            if (!disableCalled)
-            {
-                throw new Exception();
-            }
-
             RuntimeSets.Clear();
         }
     }

@@ -25,6 +25,8 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 
         protected static readonly RaycastHit[] hits = new RaycastHit[4];
 
+        [SerializeField] bool drawGizmos;
+        
         [Required]
         [SerializeField]
         TargetSelectionStrategy targetSelectionStrategy;
@@ -70,7 +72,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         {
             if (trackedTarget && 
                 trackedTarget.gameObject.activeInHierarchy && 
-                TargetSet.Contains(trackedTarget))
+                IsValidTarget(trackedTarget))
             {
                 return trackedTarget;
             }
@@ -148,14 +150,13 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
             }
         }
 
-        protected abstract ICollection<Rigidbody> TargetSet { get; }
+        protected abstract bool IsValidTarget(Rigidbody body);
 
         protected virtual void OnTargetRemoved(Rigidbody rb) { }
 
         protected void OnEntryAdded(Rigidbody rb)
         {
-            var targetSet = TargetSet;
-            if (targetSet == null || targetSet.Contains(rb))
+            if (IsValidTarget(rb))
             {
                 if (trackedBodies.TryGetValue(rb, out var refCount))
                 {
@@ -257,7 +258,7 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
         Vector3 GetActualPosition(Rigidbody possibleTarget)
         {
             Vector3 actualPosition;
-            var marker = possibleTarget.GetComponent<HitAreaMarker>();
+            var marker = possibleTarget.GetComponentInChildren<HitAreaMarker>();
             if (marker)
             {
                 actualPosition = marker.transform.position;
@@ -336,6 +337,11 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Guns
 
         void OnDrawGizmosSelected()
         {
+            if (!drawGizmos)
+            {
+                return;
+            }
+            
             var targetRange = 0f;
             var targetCone = 0f;
             if (MaximumTargetRange <= 0)
