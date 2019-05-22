@@ -87,6 +87,11 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
                 effectivePrefab = projectileOverride;
             }
 
+            if (ServiceBehaviour && !ServiceBehaviour.gameObject.activeSelf)
+            {
+                OnConfigureService(ServiceBehaviour);
+            }
+
             RecalculateBallisticFlag();
             return effectivePrefab;
         }
@@ -106,6 +111,13 @@ namespace RabbitStewdio.Unity.WeaponSystem.Weapons.Projectiles
         /// <param name="b"></param>
         protected override void OnConfigureService(WeaponProjectilePoolBehaviour b)
         {
+            if (!effectivePrefab)
+            {
+                Debug.Log("WeaponProjectilePrefab for " + name + " not found. Starting disabled.", this);
+                b.gameObject.SetActive(false);
+                return;
+            }
+
             b.PoolSizeLimit = poolSizeLimit;
             b.Prefab = effectivePrefab;
             b.StrictLimit = strictLimit;

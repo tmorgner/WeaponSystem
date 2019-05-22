@@ -20,7 +20,7 @@ namespace RabbitStewdio.Unity.UnityTools.Prototyping
         {
             if (traceEnabled)
             {
-                Debug.Log("On Collision Enter: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath());
+                Debug.Log("On Collision Enter: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath() + " " + other.collider);
             }
         }
 
@@ -28,7 +28,7 @@ namespace RabbitStewdio.Unity.UnityTools.Prototyping
         {
             if (traceEnabled)
             {
-                Debug.Log("On Collision Exit: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath());
+                Debug.Log("On Collision Exit: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath() + " " + other.collider);
             }
         }
 
@@ -36,7 +36,7 @@ namespace RabbitStewdio.Unity.UnityTools.Prototyping
         {
             if (traceEnabled)
             {
-                Debug.Log("On Trigger Enter: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath());
+                Debug.Log("On Trigger Enter: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath() + " " + other);
             }
         }
 
@@ -44,7 +44,7 @@ namespace RabbitStewdio.Unity.UnityTools.Prototyping
         {
             if (traceEnabled)
             {
-                Debug.Log("On Trigger Exit: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath());
+                Debug.Log("On Trigger Exit: Self=" + gameObject.GetPath() + " other=" + other.gameObject.GetPath() + " " + other);
             }
         }
     }

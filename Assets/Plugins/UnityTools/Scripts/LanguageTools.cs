@@ -37,6 +37,7 @@ namespace RabbitStewdio.Unity.UnityTools
         }
 
 
+#if !ENABLE_IL2CPP        
         static Func<T, T, bool> GenerateHasFlag<T>() where T : struct, IComparable, IFormattable, IConvertible
         {
             var value = Expression.Parameter(typeof(T));
@@ -61,5 +62,17 @@ namespace RabbitStewdio.Unity.UnityTools
             return Expression.Lambda<Func<T, T, bool>>(hasFlagExpression, value, flag)
                              .Compile();
         }
+#else
+        static Func<T, T, bool> GenerateHasFlag<T>() where T : struct, IComparable, IFormattable, IConvertible
+        {
+            return (value, flag) =>
+            {
+                var valueLong = value.ToInt64(NumberFormatInfo.CurrentInfo);
+                var flagLong = flag.ToInt64(NumberFormatInfo.CurrentInfo);
+                return (valueLong & flagLong) == flagLong;
+            };
+        }
+#endif        
+        
     }
 }
